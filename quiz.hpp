@@ -36,7 +36,7 @@ public:
     void reset();
 };
 
-//************************** Huiz Class **********************************
+//************************** Quiz Class **********************************
 
 class quiz : public std::list<std::string> {
 public:
@@ -81,6 +81,9 @@ public:
         , n(n)
     {
     }
+
+    void avalidmsg() const;
+    void activatemsg() const;
 
     virtual void action(game& gm, player& p, game::iterator& t) = 0;
 };

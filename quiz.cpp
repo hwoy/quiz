@@ -91,29 +91,40 @@ void game::showquiz(iterator i) const
 }
 
 //************************** Helper methodes **********************************
+void helper::avalidmsg() const
+{
+    std::cout << name << " is no longer avaliable\n\n";
+}
+
+void helper::activatemsg() const
+{
+    std::cout << name << " is activted\n\n";
+}
 
 void randomhelper::action(game& gm, player& p, game::iterator& i)
 {
     if (!n) {
-        std::cout << name << " is no longer avaliable\n\n";
-    } else {
-        std::cout << name << " is activted\n\n";
-        std::shuffle(i, gm.end(), gm.gen);
-        --n;
+        avalidmsg();
+        --i;
+        return;
     }
+    activatemsg();
+    std::shuffle(i, gm.end(), gm.gen);
+    --n;
     --i;
 }
 
 void doublehelper::action(game& gm, player& p, game::iterator& i)
 {
     if (!n) {
-        std::cout << name << " is no longer avaliable\n\n";
+        avalidmsg();
+        --i;
         return;
     }
     unsigned int j = 2;
     bool win = false;
 
-    std::cout << name << " is activted\n\n";
+    activatemsg();
 
     do {
         std::cout << "Remain: " << j << "\n\n";
@@ -133,10 +144,11 @@ void doublehelper::action(game& gm, player& p, game::iterator& i)
 void passhelper::action(game& gm, player& p, game::iterator& i)
 {
     if (!n) {
-        std::cout << name << " is no longer avaliable\n\n";
+        avalidmsg();
+        --i;
         return;
     }
-    std::cout << name << " is activted\n\n";
+    activatemsg();
     p.score++;
     --n;
 }
@@ -144,15 +156,14 @@ void passhelper::action(game& gm, player& p, game::iterator& i)
 void hinthelper::action(game& gm, player& p, game::iterator& i)
 {
     if (!n) {
-        std::cout << name << " is no longer avaliable\n\n";
+        avalidmsg();
+        --i;
         return;
     }
 
-    std::cout << name << " is activted\n\n";
-    unsigned int j;
+    activatemsg();
 
-    j = (gm.gen() % 2) ? i->answer : (gm.gen() % i->size() + 1);
-    std::cout << "May be: " << j << "\n\n";
+    std::cout << "May be: " << ((gm.gen() % 2) ? i->answer : (gm.gen() % i->size() + 1)) << "\n\n";
     --n;
     --i;
 }
@@ -160,11 +171,12 @@ void hinthelper::action(game& gm, player& p, game::iterator& i)
 void pumphelper::action(game& gm, player& p, game::iterator& i)
 {
     if (!n) {
-        std::cout << name << " is no longer avaliable\n\n";
+        avalidmsg();
+        --i;
         return;
     }
 
-    std::cout << name << " is activted\n\n";
+    activatemsg();
 
     std::vector<unsigned int> vec;
 
