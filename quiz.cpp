@@ -26,15 +26,19 @@ game::game()
 
 void game::play(player& p)
 {
-    for (auto i = begin(); i != end(); ++i) {
+    for (auto i = begin(); i != end(); ) {
         showhelper();
         showquiz(i);
         choosequiz(p);
 
         if (p.choose >= help.front()->key && p.choose <= help.back()->key)
             help[p.choose - help[0]->key]->action(*this, p, i);
-        else if (p.choose == i->answer)
-            p.score++;
+        else if (p.choose >=1 && p.choose <= i->size())
+		{
+			if(p.choose == i->answer)
+				++p.score;
+			++i;
+		}
     }
 }
 
@@ -105,20 +109,17 @@ void randomhelper::action(game& gm, player& p, game::iterator& i)
 {
     if (!n) {
         avalidmsg();
-        --i;
         return;
     }
     activatemsg();
     std::shuffle(i, gm.end(), gm.gen);
     --n;
-    --i;
 }
 
 void doublehelper::action(game& gm, player& p, game::iterator& i)
 {
     if (!n) {
         avalidmsg();
-        --i;
         return;
     }
     unsigned int j = 2;
@@ -127,37 +128,46 @@ void doublehelper::action(game& gm, player& p, game::iterator& i)
     activatemsg();
 
     do {
+		
+		do
+		{
         std::cout << "Remain: " << j << "\n\n";
 
         gm.showquiz(i);
         gm.choosequiz(p);
-        if (p.choose == i->answer)
-            win = true;
+		
+
+		if(p.choose == i->answer)
+			win=true;
+
+		
+		}while(!(p.choose >=1 && p.choose <= i->size()));
+
 
     } while (--j);
 
     if (win)
         p.score++;
     --n;
+	++i;
 }
 
 void passhelper::action(game& gm, player& p, game::iterator& i)
 {
     if (!n) {
         avalidmsg();
-        --i;
         return;
     }
     activatemsg();
     p.score++;
-    --n;
+	--n;
+	++i;
 }
 
 void hinthelper::action(game& gm, player& p, game::iterator& i)
 {
     if (!n) {
         avalidmsg();
-        --i;
         return;
     }
 
@@ -165,14 +175,12 @@ void hinthelper::action(game& gm, player& p, game::iterator& i)
 
     std::cout << "May be: " << ((gm.gen() % 2) ? i->answer : (gm.gen() % i->size() + 1)) << "\n\n";
     --n;
-    --i;
 }
 
 void pumphelper::action(game& gm, player& p, game::iterator& i)
 {
     if (!n) {
         avalidmsg();
-        --i;
         return;
     }
 
@@ -189,5 +197,4 @@ void pumphelper::action(game& gm, player& p, game::iterator& i)
     gm.help[j]->n++;
     std::cout << gm.help[j]->name << " is pubped\n";
     --n;
-    --i;
 }
