@@ -38,7 +38,7 @@ public:
 
 //************************** Quiz Class **********************************
 
-class quiz : public std::list<std::string> {
+class quiz : public std::vector<std::string> {
 public:
     std::string quiz;
     unsigned int answer;

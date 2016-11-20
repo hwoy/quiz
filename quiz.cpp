@@ -26,19 +26,18 @@ game::game()
 
 void game::play(player& p)
 {
-    for (auto i = begin(); i != end(); ) {
+    for (auto i = begin(); i != end();) {
         showhelper();
         showquiz(i);
         choosequiz(p);
 
         if (p.choose >= help.front()->key && p.choose <= help.back()->key)
             help[p.choose - help[0]->key]->action(*this, p, i);
-        else if (p.choose >=1 && p.choose <= i->size())
-		{
-			if(p.choose == i->answer)
-				++p.score;
-			++i;
-		}
+        else if (p.choose >= 1 && p.choose <= i->size()) {
+            if (p.choose == i->answer)
+                ++p.score;
+            ++i;
+        }
     }
 }
 
@@ -87,10 +86,9 @@ void game::showquiz(iterator i) const
 {
     std::cout << i - begin() + 1 << "/" << size() << " [ " << i->quiz << " ]\n";
 
-    unsigned int n = 1;
-    for (const auto& j : *i) {
+    for (auto j = i->begin(); j != i->end(); ++j) {
 
-        std::cout << n++ << ") " << j << std::endl;
+        std::cout << j - i->begin() + 1 << ") " << *j << std::endl;
     }
 }
 
@@ -128,28 +126,24 @@ void doublehelper::action(game& gm, player& p, game::iterator& i)
     activatemsg();
 
     do {
-		
-		do
-		{
-        std::cout << "Remain: " << j << "\n\n";
 
-        gm.showquiz(i);
-        gm.choosequiz(p);
-		
+        do {
+            std::cout << "Remain: " << j << "\n\n";
 
-		if(p.choose == i->answer)
-			win=true;
+            gm.showquiz(i);
+            gm.choosequiz(p);
 
-		
-		}while(!(p.choose >=1 && p.choose <= i->size()));
+            if (p.choose == i->answer)
+                win = true;
 
+        } while (!(p.choose >= 1 && p.choose <= i->size()));
 
     } while (--j);
 
     if (win)
         p.score++;
     --n;
-	++i;
+    ++i;
 }
 
 void passhelper::action(game& gm, player& p, game::iterator& i)
@@ -160,8 +154,8 @@ void passhelper::action(game& gm, player& p, game::iterator& i)
     }
     activatemsg();
     p.score++;
-	--n;
-	++i;
+    --n;
+    ++i;
 }
 
 void hinthelper::action(game& gm, player& p, game::iterator& i)
