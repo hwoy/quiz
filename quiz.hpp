@@ -2,8 +2,7 @@
 #define _QUIZ_H_
 
 #include <algorithm>
-#include <cstdlib>
-#include <ctime>
+#include <chrono>
 #include <iostream>
 #include <list>
 #include <memory>
@@ -53,7 +52,7 @@ public:
     std::mt19937 gen;
     std::vector<std::unique_ptr<helper> > help;
 
-    game();
+    game(std::mt19937::result_type t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
 
     void shuffle(unsigned int i = 1);
 

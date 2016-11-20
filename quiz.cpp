@@ -14,14 +14,9 @@ void player::reset()
 
 //************************** Game methodes **********************************
 
-game::game()
-    : gen(std::time(nullptr))
+game::game(std::mt19937::result_type t)
+    : gen(t)
 {
-    help.push_back(std::unique_ptr<helper>(new randomhelper("Random", 10)));
-    help.push_back(std::unique_ptr<helper>(new doublehelper("Double", 11)));
-    help.push_back(std::unique_ptr<helper>(new passhelper("Pass", 12)));
-    help.push_back(std::unique_ptr<helper>(new hinthelper("Hint", 13)));
-    help.push_back(std::unique_ptr<helper>(new pumphelper("Pump", 14)));
 }
 
 void game::play(player& p)
