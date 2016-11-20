@@ -52,7 +52,8 @@ public:
     std::mt19937 gen;
     std::vector<std::unique_ptr<helper> > help;
 
-    game(std::mt19937::result_type t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+    game(std::mt19937::result_type t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()))
+	: gen(t) {}
 
     void shuffle(unsigned int i = 1);
 
@@ -65,6 +66,8 @@ public:
     void showquiz(iterator i) const;
 
     void showhelper() const;
+
+    void addhelper(helper* h);
 };
 
 //************************** Helper Class **********************************

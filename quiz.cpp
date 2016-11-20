@@ -14,11 +14,6 @@ void player::reset()
 
 //************************** Game methodes **********************************
 
-game::game(std::mt19937::result_type t)
-    : gen(t)
-{
-}
-
 void game::play(player& p)
 {
     for (auto i = begin(); i != end();) {
@@ -85,6 +80,11 @@ void game::showquiz(iterator i) const
 
         std::cout << j - i->begin() + 1 << ") " << *j << std::endl;
     }
+}
+
+void game::addhelper(helper* h)
+{
+    help.push_back(std::unique_ptr<helper>(h));
 }
 
 //************************** Helper methodes **********************************

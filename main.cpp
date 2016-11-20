@@ -8,11 +8,11 @@ int main()
 
     player voy("Hwoy"), view("View");
 
-    g.help.push_back(std::unique_ptr<helper>(new randomhelper("Random", 10)));
-    g.help.push_back(std::unique_ptr<helper>(new doublehelper("Double", 11)));
-    g.help.push_back(std::unique_ptr<helper>(new passhelper("Pass", 12)));
-    g.help.push_back(std::unique_ptr<helper>(new hinthelper("Hint", 13)));
-    g.help.push_back(std::unique_ptr<helper>(new pumphelper("Pump", 14)));
+    g.addhelper(new randomhelper("Random", 10));
+    g.addhelper(new doublehelper("Double", 11));
+    g.addhelper(new passhelper("Pass", 12));
+    g.addhelper(new hinthelper("Hint", 13));
+    g.addhelper(new pumphelper("Pump", 14));
 
     q.quiz = "1+1=?";
     q.clear();
