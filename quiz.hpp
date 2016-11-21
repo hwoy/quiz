@@ -5,10 +5,12 @@
 #include <chrono>
 #include <iostream>
 #include <list>
+#include <map>
 #include <memory>
 #include <random>
 #include <string>
 #include <vector>
+#include <tuple>
 
 class helper;
 class randomhelper;
@@ -50,10 +52,12 @@ public:
     typedef std::vector<quiz>::iterator iterator;
 
     std::mt19937 gen;
-    std::vector<std::unique_ptr<helper> > help;
+    std::map<unsigned int, std::unique_ptr<helper> > help;
 
     game(std::mt19937::result_type t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()))
-	: gen(t) {}
+        : gen(t)
+    {
+    }
 
     void shuffle(unsigned int i = 1);
 
@@ -67,7 +71,7 @@ public:
 
     void showhelper() const;
 
-    void addhelper(helper* h);
+    void addhelper(unsigned int key, helper* h);
 };
 
 //************************** Helper Class **********************************
@@ -77,9 +81,8 @@ public:
     unsigned int key;
     std::string name;
 
-    helper(const char* name, unsigned int key, unsigned int n)
+    helper(const char* name, unsigned int n)
         : name(name)
-        , key(key)
         , n(n)
     {
     }
@@ -87,57 +90,57 @@ public:
     void avalidmsg() const;
     void activatemsg() const;
 
-    virtual void action(game& gm, player& p, game::iterator& t) = 0;
+    virtual void action(game& gm, player& p, game::iterator& t, unsigned int key) = 0;
 };
 
 class randomhelper : public helper {
 public:
-    randomhelper(const char* name, unsigned int key, unsigned int n = 1)
-        : helper(name, key, n)
+    randomhelper(const char* name, unsigned int n = 1)
+        : helper(name, n)
     {
     }
 
-    void action(game& gm, player& p, game::iterator& i);
+    void action(game& gm, player& p, game::iterator& i, unsigned int key);
 };
 
 class doublehelper : public helper {
 public:
-    doublehelper(const char* name, unsigned int key, unsigned int n = 1)
-        : helper(name, key, n)
+    doublehelper(const char* name, unsigned int n = 1)
+        : helper(name, n)
     {
     }
 
-    void action(game& gm, player& p, game::iterator& i);
+    void action(game& gm, player& p, game::iterator& i, unsigned int key);
 };
 
 class passhelper : public helper {
 public:
-    passhelper(const char* name, unsigned int key, unsigned int n = 1)
-        : helper(name, key, n)
+    passhelper(const char* name, unsigned int n = 1)
+        : helper(name, n)
     {
     }
 
-    void action(game& gm, player& p, game::iterator& i);
+    void action(game& gm, player& p, game::iterator& i, unsigned int key);
 };
 
 class hinthelper : public helper {
 public:
-    hinthelper(const char* name, unsigned int key, unsigned int n = 1)
-        : helper(name, key, n)
+    hinthelper(const char* name, unsigned int n = 1)
+        : helper(name, n)
     {
     }
 
-    void action(game& gm, player& p, game::iterator& i);
+    void action(game& gm, player& p, game::iterator& i, unsigned int key);
 };
 
 class pumphelper : public helper {
 public:
-    pumphelper(const char* name, unsigned int key, unsigned int n = 1)
-        : helper(name, key, n)
+    pumphelper(const char* name, unsigned int n = 1)
+        : helper(name, n)
     {
     }
 
-    void action(game& gm, player& p, game::iterator& i);
+    void action(game& gm, player& p, game::iterator& i, unsigned int key);
 };
 
 #endif

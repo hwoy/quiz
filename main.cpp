@@ -1,6 +1,30 @@
 #include "quiz.hpp"
 #include <iostream>
 
+class winhelper : public helper {
+public:
+    winhelper(const char* name, unsigned int n = 1)
+        : helper(name, n)
+    {
+    }
+
+	void action(game& gm, player& p, game::iterator& i, unsigned int key)
+	{
+		if (!n) {
+			avalidmsg();
+			return;
+		}
+		
+		activatemsg();
+		
+		p.score+=std::distance(i,gm.end());
+		i=gm.end();
+			
+
+		--n;
+	}
+};
+
 int main()
 {
     game g;
@@ -8,11 +32,12 @@ int main()
 
     player voy("Hwoy"), view("View");
 
-    g.addhelper(new randomhelper("Random", 10));
-    g.addhelper(new doublehelper("Double", 11));
-    g.addhelper(new passhelper("Pass", 12));
-    g.addhelper(new hinthelper("Hint", 13));
-    g.addhelper(new pumphelper("Pump", 14));
+    //g.addhelper(new randomhelper("Random", 10));
+    //g.addhelper(new doublehelper("Double", 11));
+    //g.addhelper(12,new passhelper("Pass"));
+    //g.addhelper(new hinthelper("Hint", 13));
+    g.addhelper(14,new pumphelper("Pump"));
+	g.addhelper(15,new winhelper("Win!"));
 
     q.quiz = "1+1=?";
     q.clear();

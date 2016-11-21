@@ -21,8 +21,8 @@ void game::play(player& p)
         showquiz(i);
         choosequiz(p);
 
-        if (p.choose >= help.front()->key && p.choose <= help.back()->key)
-            help[p.choose - help[0]->key]->action(*this, p, i);
+        if (!help.empty() && help.find(p.choose) != help.end())
+            help[p.choose]->action(*this, p, i, p.choose);
         else if (p.choose >= 1 && p.choose <= i->size()) {
             if (p.choose == i->answer)
                 ++p.score;
@@ -35,7 +35,7 @@ void game::showhelper() const
 {
     bool zero = true;
     for (const auto& i : help)
-        if (i->n) {
+        if (std::get<1>(i)->n) {
             zero = false;
             break;
         }
@@ -46,16 +46,16 @@ void game::showhelper() const
     std::cout << "[ ";
 
     for (const auto& i : help)
-        if (i->n)
-            std::cout << i->name << "(" << i->n << ")"
-                      << "=" << i->key << " ";
+        if (std::get<1>(i)->n)
+            std::cout << std::get<1>(i)->name << "(" << std::get<1>(i)->n << ")"
+                      << "=" << std::get<0>(i) << " ";
     std::cout << "]\n\n";
 }
 
 void game::reset(unsigned int n)
 {
     for (auto& i : help)
-        i->n = n;
+        std::get<1>(i)->n = n;
 }
 
 void game::shuffle(unsigned int i)
@@ -82,9 +82,9 @@ void game::showquiz(iterator i) const
     }
 }
 
-void game::addhelper(helper* h)
+void game::addhelper(unsigned int key, helper* h)
 {
-    help.push_back(std::unique_ptr<helper>(h));
+    help[key] = std::unique_ptr<helper>(h);
 }
 
 //************************** Helper methodes **********************************
@@ -98,7 +98,7 @@ void helper::activatemsg() const
     std::cout << name << " is activted\n\n";
 }
 
-void randomhelper::action(game& gm, player& p, game::iterator& i)
+void randomhelper::action(game& gm, player& p, game::iterator& i, unsigned int key)
 {
     if (!n) {
         avalidmsg();
@@ -109,7 +109,7 @@ void randomhelper::action(game& gm, player& p, game::iterator& i)
     --n;
 }
 
-void doublehelper::action(game& gm, player& p, game::iterator& i)
+void doublehelper::action(game& gm, player& p, game::iterator& i, unsigned int key)
 {
     if (!n) {
         avalidmsg();
@@ -141,7 +141,7 @@ void doublehelper::action(game& gm, player& p, game::iterator& i)
     ++i;
 }
 
-void passhelper::action(game& gm, player& p, game::iterator& i)
+void passhelper::action(game& gm, player& p, game::iterator& i, unsigned int key)
 {
     if (!n) {
         avalidmsg();
@@ -153,7 +153,7 @@ void passhelper::action(game& gm, player& p, game::iterator& i)
     ++i;
 }
 
-void hinthelper::action(game& gm, player& p, game::iterator& i)
+void hinthelper::action(game& gm, player& p, game::iterator& i, unsigned int key)
 {
     if (!n) {
         avalidmsg();
@@ -166,20 +166,23 @@ void hinthelper::action(game& gm, player& p, game::iterator& i)
     --n;
 }
 
-void pumphelper::action(game& gm, player& p, game::iterator& i)
+void pumphelper::action(game& gm, player& p, game::iterator& i, unsigned int key)
 {
     if (!n) {
         avalidmsg();
         return;
     }
 
-    activatemsg();
-
     std::vector<unsigned int> vec;
 
-    for (unsigned int i = 0; i < gm.help.size(); i++)
-        if (key != gm.help[i]->key)
-            vec.push_back(i);
+    for (const auto& i : gm.help)
+        if (key != std::get<0>(i))
+            vec.push_back(std::get<0>(i));
+
+    if (vec.empty())
+        return;
+
+    activatemsg();
 
     unsigned int j = vec[gm.gen() % (vec.size())];
 
