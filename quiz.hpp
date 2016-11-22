@@ -9,8 +9,8 @@
 #include <memory>
 #include <random>
 #include <string>
-#include <vector>
 #include <tuple>
+#include <vector>
 
 class helper;
 class randomhelper;
@@ -82,15 +82,15 @@ public:
     std::string name;
 
     helper(const char* name, unsigned int n)
-        : name(name)
-        , n(n)
+        : n(n)
+        , name(name)
     {
     }
 
     void avalidmsg() const;
     void activatemsg() const;
 
-    virtual void action(game& gm, player& p, game::iterator& t, unsigned int key) = 0;
+    virtual std::tuple<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key) = 0;
 };
 
 class randomhelper : public helper {
@@ -100,7 +100,7 @@ public:
     {
     }
 
-    void action(game& gm, player& p, game::iterator& i, unsigned int key);
+    std::tuple<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
 };
 
 class doublehelper : public helper {
@@ -110,7 +110,7 @@ public:
     {
     }
 
-    void action(game& gm, player& p, game::iterator& i, unsigned int key);
+    std::tuple<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
 };
 
 class passhelper : public helper {
@@ -120,7 +120,7 @@ public:
     {
     }
 
-    void action(game& gm, player& p, game::iterator& i, unsigned int key);
+    std::tuple<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
 };
 
 class hinthelper : public helper {
@@ -130,7 +130,7 @@ public:
     {
     }
 
-    void action(game& gm, player& p, game::iterator& i, unsigned int key);
+    std::tuple<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
 };
 
 class pumphelper : public helper {
@@ -140,7 +140,7 @@ public:
     {
     }
 
-    void action(game& gm, player& p, game::iterator& i, unsigned int key);
+    std::tuple<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
 };
 
 #endif

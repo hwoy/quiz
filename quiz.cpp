@@ -22,7 +22,7 @@ void game::play(player& p)
         choosequiz(p);
 
         if (!help.empty() && help.find(p.choose) != help.end())
-            help[p.choose]->action(*this, p, i, p.choose);
+            std::tie(p, i) = help[p.choose]->action(*this, p, i, p.choose);
         else if (p.choose >= 1 && p.choose <= i->size()) {
             if (p.choose == i->answer)
                 ++p.score;
@@ -98,95 +98,111 @@ void helper::activatemsg() const
     std::cout << name << " is activted\n\n";
 }
 
-void randomhelper::action(game& gm, player& p, game::iterator& i, unsigned int key)
+std::tuple<player, game::iterator> randomhelper::action(game& gm, player p, game::iterator i, unsigned int key)
 {
     if (!n) {
         avalidmsg();
-        return;
     }
-    activatemsg();
-    std::shuffle(i, gm.end(), gm.gen);
-    --n;
+
+    else {
+        activatemsg();
+        std::shuffle(i, gm.end(), gm.gen);
+        --n;
+    }
+    return std::make_tuple(p, i);
 }
 
-void doublehelper::action(game& gm, player& p, game::iterator& i, unsigned int key)
+std::tuple<player, game::iterator> doublehelper::action(game& gm, player p, game::iterator i, unsigned int key)
 {
     if (!n) {
         avalidmsg();
-        return;
     }
-    unsigned int j = 2;
-    bool win = false;
 
-    activatemsg();
+    else {
+        unsigned int j = 2;
+        bool win = false;
 
-    do {
+        activatemsg();
 
         do {
-            std::cout << "Remain: " << j << "\n\n";
 
-            gm.showquiz(i);
-            gm.choosequiz(p);
+            do {
+                std::cout << "Remain: " << j << "\n\n";
 
-            if (p.choose == i->answer)
-                win = true;
+                gm.showquiz(i);
+                gm.choosequiz(p);
 
-        } while (!(p.choose >= 1 && p.choose <= i->size()));
+                if (p.choose == i->answer)
+                    win = true;
 
-    } while (--j);
+            } while (!(p.choose >= 1 && p.choose <= i->size()));
 
-    if (win)
+        } while (--j);
+
+        if (win)
+            p.score++;
+        --n;
+        ++i;
+    }
+    return std::make_tuple(p, i);
+}
+
+std::tuple<player, game::iterator> passhelper::action(game& gm, player p, game::iterator i, unsigned int key)
+{
+    if (!n) {
+        avalidmsg();
+    } else {
+        activatemsg();
         p.score++;
-    --n;
-    ++i;
+        --n;
+        ++i;
+    }
+
+    return std::make_tuple(p, i);
 }
 
-void passhelper::action(game& gm, player& p, game::iterator& i, unsigned int key)
+std::tuple<player, game::iterator> hinthelper::action(game& gm, player p, game::iterator i, unsigned int key)
 {
     if (!n) {
         avalidmsg();
-        return;
     }
-    activatemsg();
-    p.score++;
-    --n;
-    ++i;
+
+    else {
+
+        activatemsg();
+
+        std::cout << "May be: " << ((gm.gen() % 2) ? i->answer : (gm.gen() % i->size() + 1)) << "\n\n";
+        --n;
+    }
+
+    return std::make_tuple(p, i);
 }
 
-void hinthelper::action(game& gm, player& p, game::iterator& i, unsigned int key)
+std::tuple<player, game::iterator> pumphelper::action(game& gm, player p, game::iterator i, unsigned int key)
 {
     if (!n) {
         avalidmsg();
-        return;
     }
 
-    activatemsg();
+    else {
 
-    std::cout << "May be: " << ((gm.gen() % 2) ? i->answer : (gm.gen() % i->size() + 1)) << "\n\n";
-    --n;
-}
+        std::vector<unsigned int> vec;
 
-void pumphelper::action(game& gm, player& p, game::iterator& i, unsigned int key)
-{
-    if (!n) {
-        avalidmsg();
-        return;
+        for (const auto& i : gm.help)
+            if (key != std::get<0>(i))
+                vec.push_back(std::get<0>(i));
+
+        if (vec.empty())
+            return std::make_tuple(p, i);
+
+        activatemsg();
+
+        unsigned int j = vec[gm.gen() % (vec.size())];
+
+        gm.help[j]->n++;
+        std::cout << gm.help[j]->name << " is pubped\n";
+        --n;
     }
 
-    std::vector<unsigned int> vec;
-
-    for (const auto& i : gm.help)
-        if (key != std::get<0>(i))
-            vec.push_back(std::get<0>(i));
-
-    if (vec.empty())
-        return;
-
-    activatemsg();
-
-    unsigned int j = vec[gm.gen() % (vec.size())];
-
-    gm.help[j]->n++;
-    std::cout << gm.help[j]->name << " is pubped\n";
-    --n;
+    return std::make_tuple(p, i);
 }

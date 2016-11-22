@@ -8,21 +8,24 @@ public:
     {
     }
 
-	void action(game& gm, player& p, game::iterator& i, unsigned int key)
-	{
-		if (!n) {
-			avalidmsg();
-			return;
-		}
-		
-		activatemsg();
-		
-		p.score+=std::distance(i,gm.end());
-		i=gm.end();
-			
+    std::tuple<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key)
+    {
+        if (!n) {
+            avalidmsg();
+        }
 
-		--n;
-	}
+        else {
+
+            activatemsg();
+
+            p.score += std::distance(i, gm.end());
+            i = gm.end();
+
+            --n;
+        }
+
+        return std::make_tuple(p, i);
+    }
 };
 
 int main()
@@ -32,12 +35,12 @@ int main()
 
     player voy("Hwoy"), view("View");
 
-    //g.addhelper(new randomhelper("Random", 10));
-    //g.addhelper(new doublehelper("Double", 11));
-    //g.addhelper(12,new passhelper("Pass"));
-    //g.addhelper(new hinthelper("Hint", 13));
-    g.addhelper(14,new pumphelper("Pump"));
-	g.addhelper(15,new winhelper("Win!"));
+    g.addhelper(10,new randomhelper("Random"));
+    g.addhelper(11,new doublehelper("Double"));
+    g.addhelper(12,new passhelper("Pass"));
+    g.addhelper(13,new hinthelper("Hint"));
+    g.addhelper(14, new pumphelper("Pump"));
+    g.addhelper(15, new winhelper("Win!"));
 
     q.quiz = "1+1=?";
     q.clear();
