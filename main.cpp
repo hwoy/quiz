@@ -35,12 +35,13 @@ int main()
 
     player voy("Hwoy"), view("View");
 
-    g.addhelper(10,new randomhelper("Random"));
-    g.addhelper(11,new doublehelper("Double"));
-    g.addhelper(12,new passhelper("Pass"));
-    g.addhelper(13,new hinthelper("Hint"));
-    g.addhelper(14, new pumphelper("Pump"));
-    g.addhelper(15, new winhelper("Win!"));
+    g.addhelper(10,new randomhelper("Random1",3));
+	g.addhelper(11,new randomhelper("Random2",3));
+    //g.addhelper(11,new doublehelper("Double"));
+    //g.addhelper(12,new passhelper("Pass"));
+    //g.addhelper(13,new hinthelper("Hint"));
+    //g.addhelper(14, new pumphelper("Pump"));
+    //g.addhelper(15, new winhelper("Win!"));
 
     q.quiz = "1+1=?";
     q.clear();

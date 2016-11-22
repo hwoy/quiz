@@ -171,7 +171,8 @@ std::tuple<player, game::iterator> hinthelper::action(game& gm, player p, game::
 
         activatemsg();
 
-        std::cout << "May be: " << ((gm.gen() % 2) ? i->answer : (gm.gen() % i->size() + 1)) << "\n\n";
+        std::cout << "May be: " << (std::uniform_int_distribution<>(0, 1)(gm.gen) ? i->answer
+									: std::uniform_int_distribution<>(1, i->size())(gm.gen)) << "\n\n";
         --n;
     }
 
