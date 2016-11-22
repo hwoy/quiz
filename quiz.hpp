@@ -10,7 +10,6 @@
 #include <random>
 #include <string>
 #include <tuple>
-#include <vector>
 
 class helper;
 class randomhelper;
@@ -39,17 +38,30 @@ public:
 
 //************************** Quiz Class **********************************
 
-class quiz : public std::vector<std::string> {
+class quiz : public std::list<std::string> {
 public:
-    std::string quiz;
+    std::string quizstr;
     unsigned int answer;
+	unsigned int scorepoint;
+	
+	quiz(unsigned int scorepoint=dscorepoint):scorepoint(scorepoint){}
+	quiz(std::string quizstr,unsigned int answer,unsigned int scorepoint=dscorepoint):quizstr(quizstr),answer(answer),scorepoint(scorepoint){}
+	
+	quiz& operator=( std::initializer_list<std::string> ilist )
+	{
+		std::list<std::string>::operator=(ilist);
+		return *this;
+	}
+	
+	static const unsigned int dscorepoint=100;
 };
 
 //************************** Game Class **********************************
 
-class game : public std::vector<quiz> {
+class game : public std::list<quiz> {
 public:
-    typedef std::vector<quiz>::iterator iterator;
+    typedef std::list<quiz>::iterator iterator;
+	typedef std::list<quiz>::value_type value_type;
 
     std::mt19937 gen;
     std::map<unsigned int, std::unique_ptr<helper> > help;
@@ -67,7 +79,7 @@ public:
 
     void choosequiz(player& p);
 
-    void showquiz(iterator i) const;
+    void showquiz(iterator i);
 
     void showhelper() const;
 

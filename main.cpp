@@ -17,10 +17,10 @@ public:
         else {
 
             activatemsg();
-
-            p.score += std::distance(i, gm.end());
-            i = gm.end();
-
+			
+			for(;i!=gm.end();++i)
+				p.score+=i->scorepoint;
+			
             --n;
         }
 
@@ -31,53 +31,39 @@ public:
 int main()
 {
     game g;
-    quiz q;
 
     player voy("Hwoy"), view("View");
 
-    g.addhelper(10,new randomhelper("Random1",3));
-	g.addhelper(11,new randomhelper("Random2",3));
-    //g.addhelper(11,new doublehelper("Double"));
-    //g.addhelper(12,new passhelper("Pass"));
-    //g.addhelper(13,new hinthelper("Hint"));
-    //g.addhelper(14, new pumphelper("Pump"));
-    //g.addhelper(15, new winhelper("Win!"));
+    g.addhelper(10,new randomhelper("Random"));
+    g.addhelper(11,new doublehelper("Double"));
+    g.addhelper(12,new passhelper("Pass"));
+    g.addhelper(13,new hinthelper("Hint"));
+    g.addhelper(14,new pumphelper("Pump"));
+    g.addhelper(15,new winhelper("Win!"));
 
-    q.quiz = "1+1=?";
-    q.clear();
-    q.push_back("1");
-    q.push_back("2");
-    q.push_back("3");
-    q.push_back("4");
-    q.answer = 2;
-    g.push_back(q);
+	{
+		quiz q("1+1=?",2);
+		q={"1","2","3","4"};
+		g.push_back(q);
+	}
 
-    q.quiz = "What's my name?";
-    q.clear();
-    q.push_back("Hwoy");
-    q.push_back("View");
-    q.push_back("Kung");
-    q.push_back("Ring");
-    q.answer = 1;
-    g.push_back(q);
+	{
+		quiz q("What's my name?",1);
+		q={"Hwoy","View","Kung","Ring"};
+		g.push_back(q);
+	}
 
-    q.quiz = "2*2=?";
-    q.clear();
-    q.push_back("4");
-    q.push_back("5");
-    q.push_back("55");
-    q.push_back("6");
-    q.answer = 1;
-    g.push_back(q);
+	{
+		quiz q("2*2=?",1);
+		q={"4","8","2","16"};
+		g.push_back(q);
+	}
 
-    q.quiz = "1*2=?";
-    q.clear();
-    q.push_back("0");
-    q.push_back("1");
-    q.push_back("2");
-    q.push_back("6");
-    q.answer = 3;
-    g.push_back(q);
+	{
+		quiz q("1*2=?",3);
+		q={"0","1","2","4"};
+		g.push_back(q);
+	}
 
     g.shuffle();
     g.play(voy);

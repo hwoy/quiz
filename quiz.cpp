@@ -1,3 +1,5 @@
+#include <functional>
+#include <vector>
 #include "quiz.hpp"
 
 //************************** Player methodes **********************************
@@ -25,7 +27,7 @@ void game::play(player& p)
             std::tie(p, i) = help[p.choose]->action(*this, p, i, p.choose);
         else if (p.choose >= 1 && p.choose <= i->size()) {
             if (p.choose == i->answer)
-                ++p.score;
+                p.score+=i->scorepoint;
             ++i;
         }
     }
@@ -60,8 +62,9 @@ void game::reset(unsigned int n)
 
 void game::shuffle(unsigned int i)
 {
+	std::vector<std::reference_wrapper<value_type>> vec(begin(),end());
     for (unsigned int j = 0; j < i; j++)
-        std::shuffle(begin(), end(), gen);
+        std::shuffle(vec.begin(), vec.end(), gen);
 }
 
 void game::choosequiz(player& p)
@@ -72,13 +75,13 @@ void game::choosequiz(player& p)
     std::cout << std::endl;
 }
 
-void game::showquiz(iterator i) const
+void game::showquiz(iterator i)
 {
-    std::cout << i - begin() + 1 << "/" << size() << " [ " << i->quiz << " ]\n";
+    std::cout << std::distance(begin(),i) + 1 << "/" << size() << " [ " << i->quizstr << " ]\n";
 
     for (auto j = i->begin(); j != i->end(); ++j) {
 
-        std::cout << j - i->begin() + 1 << ") " << *j << std::endl;
+        std::cout << std::distance(i->begin(),j) + 1 << ") " << *j << std::endl;
     }
 }
 
@@ -105,8 +108,9 @@ std::tuple<player, game::iterator> randomhelper::action(game& gm, player p, game
     }
 
     else {
+		std::vector<std::reference_wrapper<game::value_type>> vec(i,gm.end());
         activatemsg();
-        std::shuffle(i, gm.end(), gm.gen);
+        std::shuffle(vec.begin(), vec.end(), gm.gen);
         --n;
     }
     return std::make_tuple(p, i);
@@ -140,7 +144,7 @@ std::tuple<player, game::iterator> doublehelper::action(game& gm, player p, game
         } while (--j);
 
         if (win)
-            p.score++;
+            p.score+=i->scorepoint;
         --n;
         ++i;
     }
@@ -153,7 +157,7 @@ std::tuple<player, game::iterator> passhelper::action(game& gm, player p, game::
         avalidmsg();
     } else {
         activatemsg();
-        p.score++;
+        p.score+=i->scorepoint;
         --n;
         ++i;
     }
