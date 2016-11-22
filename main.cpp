@@ -1,7 +1,7 @@
 #include "quiz.hpp"
 #include <iostream>
 
-class winhelper : public helper {
+class winhelper final: public helper {
 public:
     winhelper(const char* name, unsigned int n = 1)
         : helper(name, n)

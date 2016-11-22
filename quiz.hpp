@@ -93,7 +93,7 @@ public:
     virtual std::tuple<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key) = 0;
 };
 
-class randomhelper : public helper {
+class randomhelper final: public helper {
 public:
     randomhelper(const char* name, unsigned int n = 1)
         : helper(name, n)
@@ -103,7 +103,7 @@ public:
     std::tuple<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
 };
 
-class doublehelper : public helper {
+class doublehelper final: public helper {
 public:
     doublehelper(const char* name, unsigned int n = 1)
         : helper(name, n)
@@ -113,7 +113,7 @@ public:
     std::tuple<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
 };
 
-class passhelper : public helper {
+class passhelper final: public helper {
 public:
     passhelper(const char* name, unsigned int n = 1)
         : helper(name, n)
@@ -123,7 +123,7 @@ public:
     std::tuple<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
 };
 
-class hinthelper : public helper {
+class hinthelper final: public helper {
 public:
     hinthelper(const char* name, unsigned int n = 1)
         : helper(name, n)
@@ -133,7 +133,7 @@ public:
     std::tuple<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
 };
 
-class pumphelper : public helper {
+class pumphelper final: public helper {
 public:
     pumphelper(const char* name, unsigned int n = 1)
         : helper(name, n)
