@@ -18,6 +18,50 @@ class passhelper;
 class hinthelper;
 class pumphelper;
 
+static bool isnum(const std::string &str)
+{
+	for(const auto i:str)
+		if(!(i>='0' && i<='9')) return false;
+	
+	return true;
+}
+
+
+static std::tuple<bool,unsigned int> getkey(const std::map<std::string, const unsigned int > &keymap)
+{
+	std::string str;
+	std::cin >> str;
+	
+	bool retbool;
+	bool retint;
+	
+	if(!isnum(str))
+	{
+		auto i=keymap.find(str);
+		if(i==keymap.end())
+		{
+			retbool=false;
+			retint=0;
+		}
+		
+		else
+		{
+			retbool=true;
+			retint=std::get<1>(*i);
+		}
+		
+	}
+	
+	else
+	{
+		retbool=true;
+		retint=std::stoul(str);
+	}
+	
+	return std::make_tuple(retbool,retint);
+	
+}
+
 //************************** Player Class **********************************
 
 class player : public std::string {
@@ -65,10 +109,12 @@ public:
 
     std::mt19937 gen;
     std::map<unsigned int, std::unique_ptr<helper> > help;
+	std::map<std::string, unsigned int > keymap;
 
     game(std::mt19937::result_type t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()))
         : gen(t)
     {
+		keymap["-"]=GAMEID::ID_QUIT;
     }
 
     void shuffle(unsigned int i = 1);
@@ -84,6 +130,8 @@ public:
     void showhelper() const;
 
     void addhelper(unsigned int key, helper* h);
+	
+	enum GAMEID:unsigned int {ID_QUIT=-1UL,ID_NORMAL=-2UL};
 };
 
 //************************** Helper Class **********************************
