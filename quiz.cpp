@@ -1,6 +1,45 @@
+#include "quiz.hpp"
 #include <functional>
 #include <vector>
-#include "quiz.hpp"
+
+bool isnum(const std::string& str)
+{
+    for (const auto i : str)
+        if (!(i >= '0' && i <= '9'))
+            return false;
+
+    return true;
+}
+
+std::tuple<bool, unsigned int> getkey(const std::map<std::string, unsigned int>& keymap)
+{
+    std::string str;
+    std::cin >> str;
+
+    bool retbool;
+    unsigned int retint;
+
+    if (!isnum(str)) {
+        auto i = keymap.find(str);
+        if (i == keymap.end()) {
+            retbool = false;
+            retint = 0;
+        }
+
+        else {
+            retbool = true;
+            retint = std::get<1>(*i);
+        }
+
+    }
+
+    else {
+        retbool = true;
+        retint = std::stoul(str);
+    }
+
+    return std::make_tuple(retbool, retint);
+}
 
 //************************** Player methodes **********************************
 
@@ -16,21 +55,37 @@ void player::reset()
 
 //************************** Game methodes **********************************
 
-void game::play(player& p)
+std::tuple<game::GAMEID, game::iterator> game::play(player& p, game::iterator i)
 {
-    for (auto i = begin(); i != end();) {
-        showhelper();
-        showquiz(i);
-        choosequiz(p);
+    GAMEID id;
+    unsigned int key;
+	
+    showhelper();
+	showkey();
+	std::cout << std::endl;
+	
+    showquiz(i);
+	
+    std::cout << std::endl;
+    key = choosequiz();
+    std::cout << std::endl;
 
-        if (!help.empty() && help.find(p.choose) != help.end())
-            std::tie(p, i) = help[p.choose]->action(*this, p, i, p.choose);
-        else if (p.choose >= 1 && p.choose <= i->size()) {
-            if (p.choose == i->answer)
-                p.score+=i->scorepoint;
+    if (key == GAMEID::ID_QUIT) {
+        id = GAMEID::ID_QUIT;
+    } else if (key == GAMEID::ID_REDRAW) {
+        id = GAMEID::ID_REDRAW;
+    } else {
+        if (!help.empty() && help.find(key) != help.end())
+            std::tie(p, i) = help[key]->action(*this, p, i, key);
+        else if (key >= 1 && key <= i->size()) {
+            if (key == i->answer)
+                p.score += i->scorepoint;
             ++i;
         }
+        id = (static_cast<unsigned int>(std::distance(begin(),i))>=n||i == end()) ? GAMEID::ID_OVER : GAMEID::ID_NORMAL;
     }
+
+    return std::make_tuple(id, i);
 }
 
 void game::showhelper() const
@@ -51,7 +106,22 @@ void game::showhelper() const
         if (std::get<1>(i)->n)
             std::cout << std::get<1>(i)->name << "(" << std::get<1>(i)->n << ")"
                       << "=" << std::get<0>(i) << " ";
-    std::cout << "]\n\n";
+    std::cout << "]\n";
+}
+
+void game::showkey()
+{
+	for(const auto &i:keymap)
+	{
+		std::string key;
+		unsigned int id;
+		
+		std::tie(key,id)=i;
+		
+		std::cout << key << "(" << keystr[id] << ") ";
+	}
+	
+	std::cout << std::endl;
 }
 
 void game::reset(unsigned int n)
@@ -62,26 +132,34 @@ void game::reset(unsigned int n)
 
 void game::shuffle(unsigned int i)
 {
-	std::vector<std::reference_wrapper<value_type>> vec(begin(),end());
+
+    std::vector<value_type> vec(begin(), end());
     for (unsigned int j = 0; j < i; j++)
         std::shuffle(vec.begin(), vec.end(), gen);
+	
+	assign(vec.begin(),vec.end());
 }
 
-void game::choosequiz(player& p)
+unsigned int game::choosequiz() const
 {
-    std::cout << std::endl;
-    std::cout << p << ": Please choose -> ";
-    std::cin >> p.choose;
-    std::cout << std::endl;
+    bool valid;
+    unsigned int key;
+
+    do {
+        std::cout << " Please choose -> ";
+        std::tie(valid, key) = getkey(keymap);
+    } while (!valid);
+
+    return key;
 }
 
 void game::showquiz(iterator i)
 {
-    std::cout << std::distance(begin(),i) + 1 << "/" << size() << " [ " << i->quizstr << " ]\n";
+    std::cout << std::distance(begin(), i) + 1 << "/" << size() << " [ " << i->quizstr << " ]\n";
 
     for (auto j = i->begin(); j != i->end(); ++j) {
 
-        std::cout << std::distance(i->begin(),j) + 1 << ") " << *j << std::endl;
+        std::cout << std::distance(i->begin(), j) + 1 << ") " << *j << std::endl;
     }
 }
 
@@ -108,9 +186,11 @@ std::tuple<player, game::iterator> randomhelper::action(game& gm, player p, game
     }
 
     else {
-		std::vector<std::reference_wrapper<game::value_type>> vec(i,gm.end());
+        std::vector<game::value_type> vec(gm.begin(), gm.end());
         activatemsg();
-        std::shuffle(vec.begin(), vec.end(), gm.gen);
+		
+        std::shuffle(vec.begin()+std::distance(gm.begin(),i), vec.end(), gm.gen);
+		gm.assign(vec.begin(),vec.end());
         --n;
     }
     return std::make_tuple(p, i);
@@ -129,22 +209,22 @@ std::tuple<player, game::iterator> doublehelper::action(game& gm, player p, game
         activatemsg();
 
         do {
-
+            unsigned int choose;
             do {
                 std::cout << "Remain: " << j << "\n\n";
 
                 gm.showquiz(i);
-                gm.choosequiz(p);
+                choose = gm.choosequiz();
 
-                if (p.choose == i->answer)
+                if (choose == i->answer)
                     win = true;
 
-            } while (!(p.choose >= 1 && p.choose <= i->size()));
+            } while (!(choose >= 1 && choose <= i->size()));
 
         } while (--j);
 
         if (win)
-            p.score+=i->scorepoint;
+            p.score += i->scorepoint;
         --n;
         ++i;
     }
@@ -157,7 +237,7 @@ std::tuple<player, game::iterator> passhelper::action(game& gm, player p, game::
         avalidmsg();
     } else {
         activatemsg();
-        p.score+=i->scorepoint;
+        p.score += i->scorepoint;
         --n;
         ++i;
     }
@@ -176,7 +256,8 @@ std::tuple<player, game::iterator> hinthelper::action(game& gm, player p, game::
         activatemsg();
 
         std::cout << "May be: " << (std::uniform_int_distribution<>(0, 1)(gm.gen) ? i->answer
-									: std::uniform_int_distribution<>(1, i->size())(gm.gen)) << "\n\n";
+                                                                                  : std::uniform_int_distribution<>(1, i->size())(gm.gen))
+                  << "\n\n";
         --n;
     }
 
