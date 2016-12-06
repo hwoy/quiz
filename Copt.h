@@ -19,7 +19,7 @@ public:
     enum ID : unsigned int { END = -2UL,
         OTHER = -1UL };
 
-    Copt(int argc, const char** argv, const std::vector<std::string>& param, unsigned start = 1)
+    Copt(int argc, const char** argv, const std::vector<std::string>& param, unsigned int start = 1)
         : argc(argc)
         , index(start)
         , start(start)
@@ -28,7 +28,7 @@ public:
     {
     }
 
-    void init(int argc, const char** argv, const std::vector<std::string>& param, unsigned int start)
+    void init(int argc, const char** argv, const std::vector<std::string>& param, unsigned int start = 1)
     {
         this->argc = argc;
         this->argv = argv;
@@ -46,21 +46,16 @@ public:
 
                 if (!std::strncmp(argv[j], i->data(), i->size())) {
                     index = j + 1;
-                    return std::make_pair(std::distance(param.begin(), i), std::string(&argv[j][i->size()]));
+                    return std::make_pair(std::distance(param.begin(), i), std::string(argv[j] + i->size()));
                 }
             }
 
             index = j + 1;
 
-            return std::make_pair(ID::OTHER, std::string(&argv[j][0]));
+            return std::make_pair(ID::OTHER, std::string(argv[j]));
         }
 
         return std::make_pair(ID::END, std::string("End of Argument"));
-    }
-
-    std::pair<unsigned int, std::string> operator()()
-    {
-        return action();
     }
 };
 #endif

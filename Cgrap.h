@@ -1,4 +1,4 @@
-#include <list>
+#include <vector>
 #include <string>
 #include <cstring>
 
@@ -6,7 +6,7 @@
 #ifndef _CGRAP_H
 #define _CGRAP_H
 
-class Cgrap : public std::list< std::string >
+class Cgrap : public std::vector< std::string >
 {
 protected:
 

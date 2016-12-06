@@ -81,18 +81,19 @@ public:
     std::mt19937 gen;
     std::map<unsigned int, std::shared_ptr<helper> > help;
     std::map<std::string, unsigned int> keymap;
-	std::map<unsigned int,std::string> keystr;
-	
-	unsigned int n;
+    std::map<unsigned int, std::string> keystr;
+
+    unsigned int n;
 
     game(std::mt19937::result_type t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()))
-        : gen(t),n(10)
+        : gen(t)
+        , n(10)
     {
         keymap["-"] = GAMEID::ID_QUIT;
         keymap["+"] = GAMEID::ID_REDRAW;
-		
-		keystr[GAMEID::ID_QUIT]="Quit";
-		keystr[GAMEID::ID_REDRAW]="Redraw";
+
+        keystr[GAMEID::ID_QUIT] = "Quit";
+        keystr[GAMEID::ID_REDRAW] = "Redraw";
     }
 
     void shuffle(unsigned int i = 1);
@@ -106,8 +107,8 @@ public:
     void showquiz(iterator i);
 
     void showhelper() const;
-	
-	void showkey();
+
+    void showkey();
 
     void addhelper(unsigned int key, helper* h);
 };

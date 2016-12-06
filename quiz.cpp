@@ -59,13 +59,13 @@ std::tuple<game::GAMEID, game::iterator> game::play(player& p, game::iterator i)
 {
     GAMEID id;
     unsigned int key;
-	
+
     showhelper();
-	showkey();
-	std::cout << std::endl;
-	
+    showkey();
+    std::cout << std::endl;
+
     showquiz(i);
-	
+
     std::cout << std::endl;
     key = choosequiz();
     std::cout << std::endl;
@@ -82,7 +82,7 @@ std::tuple<game::GAMEID, game::iterator> game::play(player& p, game::iterator i)
                 p.score += i->scorepoint;
             ++i;
         }
-        id = (static_cast<unsigned int>(std::distance(begin(),i))>=n||i == end()) ? GAMEID::ID_OVER : GAMEID::ID_NORMAL;
+        id = (static_cast<unsigned int>(std::distance(begin(), i)) >= n || i == end()) ? GAMEID::ID_OVER : GAMEID::ID_NORMAL;
     }
 
     return std::make_tuple(id, i);
@@ -111,17 +111,16 @@ void game::showhelper() const
 
 void game::showkey()
 {
-	for(const auto &i:keymap)
-	{
-		std::string key;
-		unsigned int id;
-		
-		std::tie(key,id)=i;
-		
-		std::cout << key << "(" << keystr[id] << ") ";
-	}
-	
-	std::cout << std::endl;
+    for (const auto& i : keymap) {
+        std::string key;
+        unsigned int id;
+
+        std::tie(key, id) = i;
+
+        std::cout << key << "(" << keystr[id] << ") ";
+    }
+
+    std::cout << std::endl;
 }
 
 void game::reset(unsigned int n)
@@ -136,8 +135,8 @@ void game::shuffle(unsigned int i)
     std::vector<value_type> vec(begin(), end());
     for (unsigned int j = 0; j < i; j++)
         std::shuffle(vec.begin(), vec.end(), gen);
-	
-	assign(vec.begin(),vec.end());
+
+    assign(vec.begin(), vec.end());
 }
 
 unsigned int game::choosequiz() const
@@ -155,7 +154,7 @@ unsigned int game::choosequiz() const
 
 void game::showquiz(iterator i)
 {
-    std::cout << std::distance(begin(), i) + 1 << "/" << size() << " [ " << i->quizstr << " ]\n";
+    std::cout << std::distance(begin(), i) + 1 << "/" << (n <= size() ? n : size()) << " [ " << i->quizstr << " ]\n";
 
     for (auto j = i->begin(); j != i->end(); ++j) {
 
@@ -188,9 +187,9 @@ std::tuple<player, game::iterator> randomhelper::action(game& gm, player p, game
     else {
         std::vector<game::value_type> vec(gm.begin(), gm.end());
         activatemsg();
-		
-        std::shuffle(vec.begin()+std::distance(gm.begin(),i), vec.end(), gm.gen);
-		gm.assign(vec.begin(),vec.end());
+
+        std::shuffle(vec.begin() + std::distance(gm.begin(), i), vec.end(), gm.gen);
+        gm.assign(vec.begin(), vec.end());
         --n;
     }
     return std::make_tuple(p, i);
