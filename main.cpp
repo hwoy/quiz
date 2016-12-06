@@ -14,19 +14,22 @@
 #define A "A"
 #define PLAYER "Hwoy"
 
-static std::map<int, std::string> err = { { 1, "File can not be access!" }, \
-{ 2,
-                                                                                "An Question has not an answer." },
-    { 3, "Number of Question record doesn not match" }, { 4, "Question doesn't with Q" }, \
-{ 5,
-                                                                                              "Number of Answer record doesn not match" },
-    { 6, "Answer doesn't start with A" }, { 7, "-n: option error not a number" } };
+static std::map<int, std::string> err = { { 1, "File can not be access!" },
+    { 2,
+        "An Question has not an answer." },
+    { 3, "Number of Question record doesn not match" }, { 4, "Question doesn't with Q" },
+    { 5,
+        "Number of Answer record doesn not match" },
+    { 6, "Answer doesn't start with A" }, { 7, "-n: option error not a number" }, { 8, "Invalid Option" } };
 
-static std::vector<std::string> option = { "-f:", "-p:", "-n:", "-s" };
+static const std::vector<std::string> option = { "-f:", "-p:", "-n:", "-s", "-h" };
 enum optid : unsigned int { opt_f,
     opt_p,
     opt_n,
-    opt_s };
+    opt_s,
+    opt_h };
+
+static const std::vector<std::string> optionstr = { "Quiz File", "Player Name", "Number of Quiz", "Don't Shuffle", "Help" };
 
 class winhelper final : public helper {
 public:
@@ -54,6 +57,12 @@ public:
         return std::make_tuple(p, i);
     }
 };
+
+static void showHelp(const std::vector<std::string>& option, const std::vector<std::string>& optionstr)
+{
+    for (unsigned int i = 0; i < option.size() && i < optionstr.size(); ++i)
+        std::cout << option[i] << " = " << optionstr[i] << std::endl;
+}
 
 static std::pair<int, unsigned int> init(game& g, std::ifstream& ifs)
 {
@@ -129,6 +138,11 @@ int main(int argc, const char* argv[])
     unsigned int id;
     std::string str;
 
+    if (opt.argc == 1) {
+        showHelp(option, optionstr);
+        return 0;
+    }
+
     while (std::tie(id, str) = opt.action(), id != Copt::ID::END) {
         switch (id) {
         case optid::opt_f:
@@ -150,6 +164,18 @@ int main(int argc, const char* argv[])
         case optid::opt_s:
             shuffle = false;
             break;
+
+        case optid::opt_h:
+            showHelp(option, optionstr);
+            return 0;
+            break;
+
+        default:
+            std::cerr << "Option: " << str << " is invalid\n";
+            std::cerr << " Error code:" << 8 << " = " << err[8] << std::endl;
+            std::cerr << std::endl;
+            showHelp(option, optionstr);
+            return 1;
         }
     }
 
@@ -158,18 +184,17 @@ int main(int argc, const char* argv[])
     g.addhelper(12, new passhelper("Pass"));
     g.addhelper(13, new hinthelper("Hint"));
     g.addhelper(14, new pumphelper("Pump"));
-    g.addhelper(15, new winhelper("Win!"));
+    //g.addhelper(15, new winhelper("Win!"));
 
     {
         int retcode;
         unsigned int line;
         std::ifstream ifs(file);
 
-        if (!ifs)
-		{
+        if (!ifs) {
             std::cerr << " Error code:" << 1 << " = " << err[1] << std::endl;
-			return 1;
-		}
+            return 1;
+        }
 
         std::tie(retcode, line)
             = init(g, ifs);
@@ -182,7 +207,7 @@ int main(int argc, const char* argv[])
 
     if (shuffle)
         g.shuffle();
-	
+
     for (game::iterator i = g.begin(); i != g.end();) {
         game::GAMEID id;
         std::tie(id, i) = g.play(voy, i);
