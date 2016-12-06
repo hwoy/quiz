@@ -61,7 +61,7 @@ public:
 static void showHelp(const std::vector<std::string>& option, const std::vector<std::string>& optionstr)
 {
     for (unsigned int i = 0; i < option.size() && i < optionstr.size(); ++i)
-        std::cout << option[i] << " = " << optionstr[i] << std::endl;
+        std::cerr << option[i] << " = " << optionstr[i] << std::endl;
 }
 
 static std::pair<int, unsigned int> init(game& g, std::ifstream& ifs)
