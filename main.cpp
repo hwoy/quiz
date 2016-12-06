@@ -13,6 +13,7 @@
 #define Q "Q"
 #define A "A"
 #define PLAYER "Hwoy"
+#define NQUIZ 10
 
 static std::map<int, std::string> err = { { 1, "File can not be access!" },
     { 2,
@@ -132,7 +133,7 @@ int main(int argc, const char* argv[])
     player voy(PLAYER);
     std::string file;
 
-    g.n = 10;
+    g.n = NQUIZ;
 
     Copt opt(argc, argv, option);
     unsigned int id;
