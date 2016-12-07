@@ -59,10 +59,13 @@ public:
     }
 };
 
-static void showHelp(const std::vector<std::string>& option, const std::vector<std::string>& optionstr)
+static void showHelp(const char *argv[],const std::vector<std::string>& option, const std::vector<std::string>& optionstr)
 {
     for (unsigned int i = 0; i < option.size() && i < optionstr.size(); ++i)
         std::cerr << option[i] << " = " << optionstr[i] << std::endl;
+	
+	std::cerr << "\nExample\n";
+	std::cerr << grappath(argv[0]) << " " << option[optid::opt_f] << "quiz.txt\n";
 }
 
 static std::pair<int, unsigned int> init(game& g, std::ifstream& ifs)
@@ -129,18 +132,18 @@ static std::pair<int, unsigned int> init(game& g, std::ifstream& ifs)
 int main(int argc, const char* argv[])
 {
     bool shuffle = true;
+    unsigned int id;
+	
     game g;
     player voy(PLAYER);
     std::string file;
+    Copt opt(argc, argv, option);
+    std::string str;
 
     g.n = NQUIZ;
 
-    Copt opt(argc, argv, option);
-    unsigned int id;
-    std::string str;
-
     if (opt.argc == 1) {
-        showHelp(option, optionstr);
+        showHelp(argv,option, optionstr);
         return 0;
     }
 
@@ -167,7 +170,7 @@ int main(int argc, const char* argv[])
             break;
 
         case optid::opt_h:
-            showHelp(option, optionstr);
+            showHelp(argv,option, optionstr);
             return 0;
             break;
 
@@ -175,7 +178,7 @@ int main(int argc, const char* argv[])
             std::cerr << "Option: " << str << " is invalid\n";
             std::cerr << " Error code:" << 8 << " = " << err[8] << std::endl;
             std::cerr << std::endl;
-            showHelp(option, optionstr);
+            showHelp(argv,option, optionstr);
             return 1;
         }
     }

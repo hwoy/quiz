@@ -6,6 +6,18 @@
 #ifndef _CGRAP_H
 #define _CGRAP_H
 
+static const char *grappath(const char *path)
+{
+	unsigned int i,j;
+	for(j=0,i=0;path[i];i++)
+	{
+		if(path[i]=='\\' || path[i]=='/')
+			j=i+1;
+	}
+	
+	return path+j;
+}
+
 class Cgrap : public std::vector< std::string >
 {
 protected:
