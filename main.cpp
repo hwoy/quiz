@@ -16,8 +16,7 @@
 #define NQUIZ 10
 #define DELIM ":"
 
-
-static std::map<unsigned int, std::string> err = { { 1, "File can not be access!" },
+static const std::map<unsigned int, std::string> err = { { 1, "File can not be access!" },
     { 2,
         "An Question has not an answer." },
     { 3, "Number of Question record doesn not match" }, { 4, "Question ID doesn't match" },
@@ -44,33 +43,6 @@ enum optid : unsigned int { opt_f,
     opt_h };
 
 static const std::vector<std::string> optionstr = { "Quiz File", "Player Name", "Number of Quiz", "Don't Shuffle", "Help" };
-
-class winhelper final : public helper {
-public:
-    winhelper(const char* name, unsigned int n = 1)
-        : helper(name, n)
-    {
-    }
-
-    std::tuple<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key)
-    {
-        if (!n) {
-            avalidmsg();
-        }
-
-        else {
-
-            activatemsg();
-
-            for (; i != gm.end(); ++i)
-                p.score += i->scorepoint;
-
-            --n;
-        }
-
-        return std::make_tuple(p, i);
-    }
-};
 
 static void showHelp(const char* argv[], const std::vector<std::string>& option, const std::vector<std::string>& optionstr)
 {
@@ -157,6 +129,8 @@ int main(int argc, const char* argv[])
 
     g.n = NQUIZ;
 
+    //********************* Option ************************
+
     if (opt.argc == 1) {
         showHelp(argv, option, optionstr);
         return 0;
@@ -174,7 +148,7 @@ int main(int argc, const char* argv[])
 
         case optid::opt_n:
             if (!isnum(str)) {
-                std::cerr << " Error code:" << errid::NaN << " = " << err[errid::NaN] << std::endl;
+                std::cerr << " Error code:" << errid::NaN << " = " << err.at(errid::NaN) << std::endl;
                 return errid::NaN;
             }
             g.n = std::stoul(str);
@@ -191,19 +165,14 @@ int main(int argc, const char* argv[])
 
         default:
             std::cerr << " Option: " << str << " is invalid\n";
-            std::cerr << " Error code:" << errid::invalid_opt << " = " << err[errid::invalid_opt] << std::endl;
+            std::cerr << " Error code:" << errid::invalid_opt << " = " << err.at(errid::invalid_opt) << std::endl;
             std::cerr << std::endl;
             showHelp(argv, option, optionstr);
             return errid::invalid_opt;
         }
     }
 
-    g.addhelper(10, new randomhelper("Random"));
-    g.addhelper(11, new doublehelper("Double"));
-    g.addhelper(12, new passhelper("Pass"));
-    g.addhelper(13, new hinthelper("Hint"));
-    g.addhelper(14, new pumphelper("Pump"));
-    //g.addhelper(15, new winhelper("Win!"));
+    //********************* Add Questions ************************
 
     {
         unsigned int retcode, line;
@@ -211,7 +180,7 @@ int main(int argc, const char* argv[])
 
         if (!ifs) {
             std::cerr << " FILE: " << file << std::endl;
-            std::cerr << " Error code:" << errid::file << " = " << err[errid::file] << std::endl;
+            std::cerr << " Error code:" << errid::file << " = " << err.at(errid::file) << std::endl;
             return errid::file;
         }
 
@@ -221,10 +190,20 @@ int main(int argc, const char* argv[])
         if (retcode) {
             std::cerr << " FILE: " << file << std::endl;
             std::cerr << " Line: " << line << std::endl;
-            std::cerr << " Error code:" << retcode << " = " << err[retcode] << std::endl;
+            std::cerr << " Error code:" << retcode << " = " << err.at(retcode) << std::endl;
             return retcode;
         }
     }
+
+    //********************* Add Helper ************************
+
+    g.addhelper(10, new randomhelper("Random"));
+    g.addhelper(11, new doublehelper("Double"));
+    g.addhelper(12, new passhelper("Pass"));
+    g.addhelper(13, new hinthelper("Hint"));
+    g.addhelper(14, new pumphelper("Pump"));
+
+    //********************* Play game ************************
 
     if (shuffle)
         g.shuffle();

@@ -182,4 +182,31 @@ public:
     std::tuple<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
 };
 
+class winhelper final : public helper {
+public:
+    winhelper(const char* name, unsigned int n = 1)
+        : helper(name, n)
+    {
+    }
+
+    std::tuple<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key)
+    {
+        if (!n) {
+            avalidmsg();
+        }
+
+        else {
+
+            activatemsg();
+
+            for (; i != gm.end(); ++i)
+                p.score += i->scorepoint;
+
+            --n;
+        }
+
+        return std::make_tuple(p, i);
+    }
+};
+
 #endif

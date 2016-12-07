@@ -60,6 +60,9 @@ std::tuple<game::GAMEID, game::iterator> game::play(player& p, game::iterator i)
     GAMEID id;
     unsigned int key;
 
+    if (static_cast<unsigned int>(std::distance(begin(), i)) >= n)
+        return std::make_tuple(GAMEID::ID_OVER, i);
+
     showhelper();
     showkey();
     std::cout << std::endl;
