@@ -44,7 +44,7 @@ public:
 
             for (auto i = param.begin(); i != param.end(); ++i) {
 
-                if (!std::strncmp(argv[j], i->data(), i->size())) {
+                if (!std::strncmp(argv[j], i->c_str(), i->size())) {
                     index = j + 1;
                     return std::make_pair(std::distance(param.begin(), i), std::string(argv[j] + i->size()));
                 }
