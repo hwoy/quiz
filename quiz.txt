@@ -28,8 +28,18 @@ A:3:Dog:Cat:Tux:Ox
 Q:Java is ... paradigm.
 A:2:Procedural:Pure OOP:Imperative:Functional
 
-Q:This program uses .... Feature.
+Q:This program uses .... Features.
 A:4:C++ 08:C++ 11:C++ 14:2 and 3
 
 Q:Double is .... than Float.
 A:1:Larger:Smaller:Harder:Easier
+
+Q:In C++, Vector is a ...
+A:2:Singly Linked List:Dynamic Array:B Tree:Doubly Linked List
+
+Q:Java source code is compiled to ...
+A:3:C code:X86 Machine Code:Byte Code:LLVM IR
+
+Q:Which is not a smart pointer
+A:4:auto_ptr:uniqe_ptr:share_ptr:smart_ptr
+
