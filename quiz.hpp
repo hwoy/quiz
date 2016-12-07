@@ -73,10 +73,10 @@ class game : public std::list<quiz> {
 public:
     typedef std::list<quiz>::iterator iterator;
     typedef std::list<quiz>::value_type value_type;
-    enum GAMEID : unsigned int { ID_NORMAL = 0L,
-        ID_OVER = -1UL,
-        ID_QUIT = -2UL,
-        ID_REDRAW = -3UL };
+    enum GAMEID : unsigned int { ID_NORMAL = 0,
+        ID_OVER = -1U,
+        ID_QUIT = -2U,
+        ID_REDRAW = -3U };
 
     std::mt19937 gen;
     std::map<unsigned int, std::unique_ptr<helper> > help;

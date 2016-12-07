@@ -16,8 +16,8 @@ public:
 
     std::vector<std::string> param;
 
-    enum ID : unsigned int { END = -2UL,
-        OTHER = -1UL };
+    enum ID : unsigned int { END = -2U,
+        OTHER = -1U };
 
     Copt(int argc, const char** argv, const std::vector<std::string>& param, unsigned int start = 1)
         : argc(argc)
