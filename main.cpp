@@ -22,9 +22,16 @@ static std::map<unsigned int, std::string> err = { { 1, "File can not be access!
     { 5,
         "Number of Answer record doesn not match" },
     { 6, "Answer ID doesn't match" }, { 7, "Not a number" }, { 8, "Invalid Option" } };
-	
-enum errid:unsigned int {
-	file=1,question_answer=2,question_n=3,question_id=4,answer_n=5,answer_id=6,NaN=7,invalid_opt=8
+
+enum errid : unsigned int {
+    file = 1,
+    question_answer = 2,
+    question_n = 3,
+    question_id = 4,
+    answer_n = 5,
+    answer_id = 6,
+    NaN = 7,
+    invalid_opt = 8
 };
 
 static const std::vector<std::string> option = { "-f:", "-p:", "-n:", "-s", "-h" };
@@ -63,13 +70,13 @@ public:
     }
 };
 
-static void showHelp(const char *argv[],const std::vector<std::string>& option, const std::vector<std::string>& optionstr)
+static void showHelp(const char* argv[], const std::vector<std::string>& option, const std::vector<std::string>& optionstr)
 {
     for (unsigned int i = 0; i < option.size() && i < optionstr.size(); ++i)
         std::cerr << option[i] << " = " << optionstr[i] << std::endl;
-	
-	std::cerr << "\nExample\n";
-	std::cerr << grappath(argv[0]) << " " << option[optid::opt_f] << "quiz.txt\n";
+
+    std::cerr << "\nExample\n";
+    std::cerr << grappath(argv[0]) << " " << option[optid::opt_f] << "quiz.txt\n";
 }
 
 static std::pair<unsigned int, unsigned int> init(game& g, std::ifstream& ifs)
@@ -101,7 +108,7 @@ static std::pair<unsigned int, unsigned int> init(game& g, std::ifstream& ifs)
             if (ifs.eof())
                 return std::make_pair(errid::question_answer, line);
 
-            ifs.getline(buff.get(), 256);
+            ifs.getline(buff.get(), BSIZE);
             line++;
             grap.clear();
             grap.action(buff.get(), ":");
@@ -120,8 +127,8 @@ static std::pair<unsigned int, unsigned int> init(game& g, std::ifstream& ifs)
             case 0:
                 break;
             case 1:
-				if(!isnum(grap[j]))
-					return std::make_pair(errid::NaN, line);
+                if (!isnum(grap[j]))
+                    return std::make_pair(errid::NaN, line);
                 q.answer = std::stoull(grap[j]);
                 break;
             default:
@@ -139,7 +146,7 @@ int main(int argc, const char* argv[])
 {
     bool shuffle = true;
     unsigned int id;
-	
+
     game g;
     player voy(PLAYER);
     std::string file;
@@ -149,7 +156,7 @@ int main(int argc, const char* argv[])
     g.n = NQUIZ;
 
     if (opt.argc == 1) {
-        showHelp(argv,option, optionstr);
+        showHelp(argv, option, optionstr);
         return 0;
     }
 
@@ -176,7 +183,7 @@ int main(int argc, const char* argv[])
             break;
 
         case optid::opt_h:
-            showHelp(argv,option, optionstr);
+            showHelp(argv, option, optionstr);
             return 0;
             break;
 
@@ -184,7 +191,7 @@ int main(int argc, const char* argv[])
             std::cerr << " Option: " << str << " is invalid\n";
             std::cerr << " Error code:" << errid::invalid_opt << " = " << err[errid::invalid_opt] << std::endl;
             std::cerr << std::endl;
-            showHelp(argv,option, optionstr);
+            showHelp(argv, option, optionstr);
             return errid::invalid_opt;
         }
     }
@@ -197,11 +204,11 @@ int main(int argc, const char* argv[])
     //g.addhelper(15, new winhelper("Win!"));
 
     {
-        unsigned int retcode,line;
+        unsigned int retcode, line;
         std::ifstream ifs(file);
 
         if (!ifs) {
-			std::cerr << " FILE: " << file << std::endl;
+            std::cerr << " FILE: " << file << std::endl;
             std::cerr << " Error code:" << errid::file << " = " << err[errid::file] << std::endl;
             return errid::file;
         }
@@ -210,9 +217,9 @@ int main(int argc, const char* argv[])
             = init(g, ifs);
 
         if (retcode) {
-			std::cerr << " FILE: " << file << std::endl;
+            std::cerr << " FILE: " << file << std::endl;
             std::cerr << " Line: " << line << std::endl;
-			std::cerr << " Error code:" << retcode << " = " << err[retcode] << std::endl;
+            std::cerr << " Error code:" << retcode << " = " << err[retcode] << std::endl;
             return retcode;
         }
     }
