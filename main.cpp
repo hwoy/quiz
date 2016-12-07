@@ -14,6 +14,8 @@
 #define A "A"
 #define PLAYER "Hwoy"
 #define NQUIZ 10
+#define DELIM ":"
+
 
 static std::map<unsigned int, std::string> err = { { 1, "File can not be access!" },
     { 2,
@@ -91,7 +93,7 @@ static std::pair<unsigned int, unsigned int> init(game& g, std::ifstream& ifs)
         ifs.getline(buff.get(), BSIZE);
         line++;
         grap.clear();
-        grap.action(buff.get(), ":");
+        grap.action(buff.get(), DELIM);
 
         if (grap.empty())
             continue;
@@ -111,7 +113,7 @@ static std::pair<unsigned int, unsigned int> init(game& g, std::ifstream& ifs)
             ifs.getline(buff.get(), BSIZE);
             line++;
             grap.clear();
-            grap.action(buff.get(), ":");
+            grap.action(buff.get(), DELIM);
 
         } while (grap.empty());
 
