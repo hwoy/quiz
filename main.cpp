@@ -208,7 +208,7 @@ int main(int argc, const char* argv[])
     if (shuffle)
         g.shuffle();
 
-    for (game::iterator i = g.begin(); i != g.end();) {
+    for (auto i = g.begin(); i != g.end();) {
         game::GAMEID id;
         std::tie(id, i) = g.play(voy, i);
 
