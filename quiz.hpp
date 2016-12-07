@@ -79,7 +79,7 @@ public:
         ID_REDRAW = -3U };
 
     std::mt19937 gen;
-    std::map<unsigned int, std::unique_ptr<helper> > help;
+    std::map<unsigned int, std::shared_ptr<helper> > help;
     std::map<std::string, unsigned int> keymap;
     std::map<unsigned int, std::string> keystr;
 

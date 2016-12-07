@@ -170,7 +170,7 @@ void game::showquiz(iterator i)
 
 void game::addhelper(unsigned int key, helper* h)
 {
-    help[key] = std::unique_ptr<helper>(h);
+    help[key] = std::shared_ptr<helper>(h);
 }
 
 //************************** Helper methodes **********************************
