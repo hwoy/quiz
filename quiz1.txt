@@ -1,0 +1,12 @@
+
+W:What's my name?
+A:1:Hwoy:view:Kung:Ruam
+
+Q:1+1=?
+A:2:1:2:3:4
+
+Q:The sun is ...?
+A:4:cold:wet:dry:hot
+
+Q:C++ is ... paradigm.
+A:3:Functional:Event Driven:Multi:Procedural

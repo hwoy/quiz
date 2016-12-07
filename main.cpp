@@ -15,13 +15,17 @@
 #define PLAYER "Hwoy"
 #define NQUIZ 10
 
-static std::map<int, std::string> err = { { 1, "File can not be access!" },
+static std::map<unsigned int, std::string> err = { { 1, "File can not be access!" },
     { 2,
         "An Question has not an answer." },
-    { 3, "Number of Question record doesn not match" }, { 4, "Question doesn't with Q" },
+    { 3, "Number of Question record doesn not match" }, { 4, "Question ID doesn't match" },
     { 5,
         "Number of Answer record doesn not match" },
-    { 6, "Answer doesn't start with A" }, { 7, "-n: option error not a number" }, { 8, "Invalid Option" } };
+    { 6, "Answer ID doesn't match" }, { 7, "Not a number" }, { 8, "Invalid Option" } };
+	
+enum errid:unsigned int {
+	file=1,question_answer=2,question_n=3,question_id=4,answer_n=5,answer_id=6,NaN=7,invalid_opt=8
+};
 
 static const std::vector<std::string> option = { "-f:", "-p:", "-n:", "-s", "-h" };
 enum optid : unsigned int { opt_f,
@@ -68,7 +72,7 @@ static void showHelp(const char *argv[],const std::vector<std::string>& option, 
 	std::cerr << grappath(argv[0]) << " " << option[optid::opt_f] << "quiz.txt\n";
 }
 
-static std::pair<int, unsigned int> init(game& g, std::ifstream& ifs)
+static std::pair<unsigned int, unsigned int> init(game& g, std::ifstream& ifs)
 {
     unsigned int line = 0;
 
@@ -86,16 +90,16 @@ static std::pair<int, unsigned int> init(game& g, std::ifstream& ifs)
             continue;
 
         if (grap.size() != 2)
-            return std::make_pair(3, line);
+            return std::make_pair(errid::question_n, line);
         else if (grap[0].compare(Q))
-            std::make_pair(4, line);
+            return std::make_pair(errid::question_id, line);
 
         q.clear();
         q.quizstr = grap[1];
 
         do {
             if (ifs.eof())
-                return std::make_pair(2, line);
+                return std::make_pair(errid::question_answer, line);
 
             ifs.getline(buff.get(), 256);
             line++;
@@ -105,9 +109,9 @@ static std::pair<int, unsigned int> init(game& g, std::ifstream& ifs)
         } while (grap.empty());
 
         if (grap.size() < 3)
-            return std::make_pair(5, line);
+            return std::make_pair(errid::answer_n, line);
         else if (grap[0].compare(A))
-            return std::make_pair(6, line);
+            return std::make_pair(errid::answer_id, line);
 
         for (auto i = grap.begin(); i != grap.end(); ++i) {
             auto j = std::distance(grap.begin(), i);
@@ -116,6 +120,8 @@ static std::pair<int, unsigned int> init(game& g, std::ifstream& ifs)
             case 0:
                 break;
             case 1:
+				if(!isnum(grap[j]))
+					return std::make_pair(errid::NaN, line);
                 q.answer = std::stoull(grap[j]);
                 break;
             default:
@@ -159,8 +165,8 @@ int main(int argc, const char* argv[])
 
         case optid::opt_n:
             if (!isnum(str)) {
-                std::cerr << " Error code:" << 7 << " = " << err[7] << std::endl;
-                return 7;
+                std::cerr << " Error code:" << errid::NaN << " = " << err[errid::NaN] << std::endl;
+                return errid::NaN;
             }
             g.n = std::stoul(str);
             break;
@@ -175,11 +181,11 @@ int main(int argc, const char* argv[])
             break;
 
         default:
-            std::cerr << "Option: " << str << " is invalid\n";
-            std::cerr << " Error code:" << 8 << " = " << err[8] << std::endl;
+            std::cerr << " Option: " << str << " is invalid\n";
+            std::cerr << " Error code:" << errid::invalid_opt << " = " << err[errid::invalid_opt] << std::endl;
             std::cerr << std::endl;
             showHelp(argv,option, optionstr);
-            return 1;
+            return errid::invalid_opt;
         }
     }
 
@@ -191,20 +197,22 @@ int main(int argc, const char* argv[])
     //g.addhelper(15, new winhelper("Win!"));
 
     {
-        int retcode;
-        unsigned int line;
+        unsigned int retcode,line;
         std::ifstream ifs(file);
 
         if (!ifs) {
-            std::cerr << " Error code:" << 1 << " = " << err[1] << std::endl;
-            return 1;
+			std::cerr << " FILE: " << file << std::endl;
+            std::cerr << " Error code:" << errid::file << " = " << err[errid::file] << std::endl;
+            return errid::file;
         }
 
         std::tie(retcode, line)
             = init(g, ifs);
 
         if (retcode) {
-            std::cerr << "line: " << line << " Error code:" << retcode << " = " << err[retcode] << std::endl;
+			std::cerr << " FILE: " << file << std::endl;
+            std::cerr << " Line: " << line << std::endl;
+			std::cerr << " Error code:" << retcode << " = " << err[retcode] << std::endl;
             return retcode;
         }
     }

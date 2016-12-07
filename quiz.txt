@@ -9,3 +9,6 @@ A:4:cold:wet:dry:hot
 
 Q:C++ is ... paradigm.
 A:3:Functional:Event Driven:Multi:Procedural
+
+Q:Which is the biggest?
+A:1:Sun:Earth:Mars:Pluto

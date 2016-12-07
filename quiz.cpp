@@ -8,7 +8,7 @@ bool isnum(const std::string& str)
         if (!(i >= '0' && i <= '9'))
             return false;
 
-    return true;
+    return str.empty()?false:true;
 }
 
 std::tuple<bool, unsigned int> getkey(const std::map<std::string, unsigned int>& keymap)

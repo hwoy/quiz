@@ -64,7 +64,7 @@ public:
         return *this;
     }
 
-    static const unsigned int dscorepoint = 100;
+    static const unsigned int dscorepoint = 1;
 };
 
 //************************** Game Class **********************************
