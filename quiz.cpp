@@ -11,7 +11,7 @@ bool isnum(const std::string& str)
     return str.empty() ? false : true;
 }
 
-std::tuple<bool, unsigned int> getkey(const std::map<std::string, unsigned int>& keymap)
+std::pair<bool, unsigned int> getkey(const std::map<std::string, unsigned int>& keymap)
 {
     std::string str;
     std::cin >> str;
@@ -28,7 +28,7 @@ std::tuple<bool, unsigned int> getkey(const std::map<std::string, unsigned int>&
 
         else {
             retbool = true;
-            retint = std::get<1>(*i);
+            retint = i->second;
         }
 
     }
@@ -38,7 +38,7 @@ std::tuple<bool, unsigned int> getkey(const std::map<std::string, unsigned int>&
         retint = std::stoul(str);
     }
 
-    return std::make_tuple(retbool, retint);
+    return std::make_pair(retbool, retint);
 }
 
 //************************** Player methodes **********************************
@@ -55,13 +55,13 @@ void player::reset()
 
 //************************** Game methodes **********************************
 
-std::tuple<game::GAMEID, game::iterator> game::play(player& p, game::iterator i)
+std::pair<game::GAMEID, game::iterator> game::play(player& p, game::iterator i)
 {
     GAMEID id;
     unsigned int key;
 
     if (static_cast<unsigned int>(std::distance(begin(), i)) >= n)
-        return std::make_tuple(GAMEID::ID_OVER, i);
+        return std::make_pair(GAMEID::ID_OVER, i);
 
     showhelper();
     showkey();
@@ -88,14 +88,14 @@ std::tuple<game::GAMEID, game::iterator> game::play(player& p, game::iterator i)
         id = (static_cast<unsigned int>(std::distance(begin(), i)) >= n || i == end()) ? GAMEID::ID_OVER : GAMEID::ID_NORMAL;
     }
 
-    return std::make_tuple(id, i);
+    return std::make_pair(id, i);
 }
 
 void game::showhelper() const
 {
     bool zero = true;
     for (const auto& i : help)
-        if (std::get<1>(i)->n) {
+        if (i.second->n) {
             zero = false;
             break;
         }
@@ -106,9 +106,9 @@ void game::showhelper() const
     std::cout << "[ ";
 
     for (const auto& i : help)
-        if (std::get<1>(i)->n)
-            std::cout << std::get<1>(i)->name << "(" << std::get<1>(i)->n << ")"
-                      << "=" << std::get<0>(i) << " ";
+        if (i.second->n)
+            std::cout << i.second->name << "(" << i.second->n << ")"
+                      << "=" << i.first << " ";
     std::cout << "]\n";
 }
 
@@ -129,7 +129,7 @@ void game::showkey()
 void game::reset(unsigned int n)
 {
     for (auto& i : help)
-        std::get<1>(i)->n = n;
+        i.second->n = n;
 }
 
 void game::shuffle(unsigned int i)
@@ -181,7 +181,7 @@ void helper::activatemsg() const
     std::cout << name << " is activted\n\n";
 }
 
-std::tuple<player, game::iterator> randomhelper::action(game& gm, player p, game::iterator i, unsigned int key)
+std::pair<player, game::iterator> randomhelper::action(game& gm, player p, game::iterator i, unsigned int key)
 {
     if (!n) {
         avalidmsg();
@@ -195,10 +195,10 @@ std::tuple<player, game::iterator> randomhelper::action(game& gm, player p, game
         gm.assign(vec.begin(), vec.end());
         --n;
     }
-    return std::make_tuple(p, i);
+    return std::make_pair(p, i);
 }
 
-std::tuple<player, game::iterator> doublehelper::action(game& gm, player p, game::iterator i, unsigned int key)
+std::pair<player, game::iterator> doublehelper::action(game& gm, player p, game::iterator i, unsigned int key)
 {
     if (!n) {
         avalidmsg();
@@ -230,10 +230,10 @@ std::tuple<player, game::iterator> doublehelper::action(game& gm, player p, game
         --n;
         ++i;
     }
-    return std::make_tuple(p, i);
+    return std::make_pair(p, i);
 }
 
-std::tuple<player, game::iterator> passhelper::action(game& gm, player p, game::iterator i, unsigned int key)
+std::pair<player, game::iterator> passhelper::action(game& gm, player p, game::iterator i, unsigned int key)
 {
     if (!n) {
         avalidmsg();
@@ -244,10 +244,10 @@ std::tuple<player, game::iterator> passhelper::action(game& gm, player p, game::
         ++i;
     }
 
-    return std::make_tuple(p, i);
+    return std::make_pair(p, i);
 }
 
-std::tuple<player, game::iterator> hinthelper::action(game& gm, player p, game::iterator i, unsigned int key)
+std::pair<player, game::iterator> hinthelper::action(game& gm, player p, game::iterator i, unsigned int key)
 {
     if (!n) {
         avalidmsg();
@@ -263,10 +263,10 @@ std::tuple<player, game::iterator> hinthelper::action(game& gm, player p, game::
         --n;
     }
 
-    return std::make_tuple(p, i);
+    return std::make_pair(p, i);
 }
 
-std::tuple<player, game::iterator> pumphelper::action(game& gm, player p, game::iterator i, unsigned int key)
+std::pair<player, game::iterator> pumphelper::action(game& gm, player p, game::iterator i, unsigned int key)
 {
     if (!n) {
         avalidmsg();
@@ -277,11 +277,11 @@ std::tuple<player, game::iterator> pumphelper::action(game& gm, player p, game::
         std::vector<unsigned int> vec;
 
         for (const auto& i : gm.help)
-            if (key != std::get<0>(i))
-                vec.push_back(std::get<0>(i));
+            if (key != i.first)
+                vec.push_back(i.first);
 
         if (vec.empty())
-            return std::make_tuple(p, i);
+            return std::make_pair(p, i);
 
         activatemsg();
 
@@ -292,5 +292,5 @@ std::tuple<player, game::iterator> pumphelper::action(game& gm, player p, game::
         --n;
     }
 
-    return std::make_tuple(p, i);
+    return std::make_pair(p, i);
 }

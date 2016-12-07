@@ -9,7 +9,7 @@
 #include <memory>
 #include <random>
 #include <string>
-#include <tuple>
+#include <utility>
 
 class helper;
 class randomhelper;
@@ -20,7 +20,7 @@ class pumphelper;
 
 bool isnum(const std::string& str);
 
-std::tuple<bool, unsigned int> getkey(const std::map<std::string, unsigned int>& keymap);
+std::pair<bool, unsigned int> getkey(const std::map<std::string, unsigned int>& keymap);
 
 //************************** Player Class **********************************
 
@@ -100,7 +100,7 @@ public:
 
     void reset(unsigned int n = 1);
 
-    std::tuple<game::GAMEID, game::iterator> play(player& p, game::iterator i);
+    std::pair<game::GAMEID, game::iterator> play(player& p, game::iterator i);
 
     unsigned int choosequiz() const;
 
@@ -129,7 +129,7 @@ public:
     void avalidmsg() const;
     void activatemsg() const;
 
-    virtual std::tuple<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key) = 0;
+    virtual std::pair<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key) = 0;
 };
 
 class randomhelper final : public helper {
@@ -139,7 +139,7 @@ public:
     {
     }
 
-    std::tuple<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
+    std::pair<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
 };
 
 class doublehelper final : public helper {
@@ -149,7 +149,7 @@ public:
     {
     }
 
-    std::tuple<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
+    std::pair<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
 };
 
 class passhelper final : public helper {
@@ -159,7 +159,7 @@ public:
     {
     }
 
-    std::tuple<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
+    std::pair<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
 };
 
 class hinthelper final : public helper {
@@ -169,7 +169,7 @@ public:
     {
     }
 
-    std::tuple<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
+    std::pair<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
 };
 
 class pumphelper final : public helper {
@@ -179,7 +179,7 @@ public:
     {
     }
 
-    std::tuple<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
+    std::pair<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
 };
 
 class winhelper final : public helper {
@@ -189,7 +189,7 @@ public:
     {
     }
 
-    std::tuple<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key)
+    std::pair<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key)
     {
         if (!n) {
             avalidmsg();
@@ -205,7 +205,7 @@ public:
             --n;
         }
 
-        return std::make_tuple(p, i);
+        return std::make_pair(p, i);
     }
 };
 
