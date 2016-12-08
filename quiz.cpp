@@ -93,9 +93,6 @@ std::pair<game::GAMEID, game::iterator> game::play(player& p, game::iterator i)
 
 void game::showhelper() const
 {
-    if (help.empty())
-        return;
-
     bool zero = true;
     for (const auto& i : help)
         if (i.second->n) {
