@@ -42,4 +42,3 @@ A:3:C code:X86 Machine Code:Byte Code:LLVM IR
 
 Q:Which is not a smart pointer
 A:4:auto_ptr:uniqe_ptr:share_ptr:smart_ptr
-
