@@ -64,11 +64,12 @@ static std::pair<unsigned int, unsigned int> init(game& g, std::ifstream& ifs)
     quiz q;
 
     while (!ifs.eof()) {
-        ifs.getline(buff.get(), BSIZE);
-        if (ifs.bad())
-            return std::make_pair(errid::file_io, line);
 
         line++;
+
+        if (ifs.getline(buff.get(), BSIZE).bad())
+            return std::make_pair(errid::file_io, line);
+
         grap.clear();
         grap.action(buff.get(), DELIM);
 
@@ -87,11 +88,11 @@ static std::pair<unsigned int, unsigned int> init(game& g, std::ifstream& ifs)
             if (ifs.eof())
                 return std::make_pair(errid::question_answer, line);
 
-            ifs.getline(buff.get(), BSIZE);
-            if (ifs.bad())
+            line++;
+
+            if (ifs.getline(buff.get(), BSIZE).bad())
                 return std::make_pair(errid::file_io, line);
 
-            line++;
             grap.clear();
             grap.action(buff.get(), DELIM);
 
