@@ -1,5 +1,4 @@
 #include "quiz.hpp"
-#include <functional>
 #include <vector>
 
 bool isnum(const std::string& str)

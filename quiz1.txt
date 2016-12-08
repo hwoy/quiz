@@ -1,6 +1,6 @@
 
-W:What's my name?
-A:1:Hwoy:view:Kung:Ruam
+Q:What's my name?
+A:dd1:Hwoy:view:Kung:Ruam
 
 Q:1+1=?
 A:2:1:2:3:4

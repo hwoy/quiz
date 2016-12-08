@@ -1,3 +1,4 @@
+#include <exception>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -22,7 +23,7 @@ static const std::map<unsigned int, std::string> err = { { 1, "File can not be a
     { 3, "Number of Question record doesn not match" }, { 4, "Question ID doesn't match" },
     { 5,
         "Number of Answer record doesn not match" },
-    { 6, "Answer ID doesn't match" }, { 7, "Not a number" }, { 8, "Invalid Option" } , {9,"File IO failed!"} };
+    { 6, "Answer ID doesn't match" }, { 7, "Can not covert to a number" }, { 8, "Invalid Option" }, { 9, "File IO failed!" } };
 
 enum errid : unsigned int {
     file = 1,
@@ -33,7 +34,7 @@ enum errid : unsigned int {
     answer_id = 6,
     NaN = 7,
     invalid_opt = 8,
-	file_io = 9
+    file_io = 9
 };
 
 static const std::vector<std::string> option = { "-f:", "-p:", "-n:", "-s", "-h" };
@@ -64,9 +65,9 @@ static std::pair<unsigned int, unsigned int> init(game& g, std::ifstream& ifs)
 
     while (!ifs.eof()) {
         ifs.getline(buff.get(), BSIZE);
-		if(ifs.bad())
-			return std::make_pair(errid::file_io, line);
-		
+        if (ifs.bad())
+            return std::make_pair(errid::file_io, line);
+
         line++;
         grap.clear();
         grap.action(buff.get(), DELIM);
@@ -87,9 +88,9 @@ static std::pair<unsigned int, unsigned int> init(game& g, std::ifstream& ifs)
                 return std::make_pair(errid::question_answer, line);
 
             ifs.getline(buff.get(), BSIZE);
-			if(ifs.bad())
-				return std::make_pair(errid::file_io, line);
-			
+            if (ifs.bad())
+                return std::make_pair(errid::file_io, line);
+
             line++;
             grap.clear();
             grap.action(buff.get(), DELIM);
@@ -108,9 +109,13 @@ static std::pair<unsigned int, unsigned int> init(game& g, std::ifstream& ifs)
             case 0:
                 break;
             case 1:
-                if (!isnum(grap[j]))
+                try {
+                    q.answer = std::stoul(grap[j]);
+                } catch (const std::exception& e) {
+                    std::cerr << " Exception what():" << e.what() << std::endl;
                     return std::make_pair(errid::NaN, line);
-                q.answer = std::stoull(grap[j]);
+                }
+
                 break;
             default:
                 q.push_back(grap[j]);
@@ -154,11 +159,13 @@ int main(int argc, const char* argv[])
             break;
 
         case optid::opt_n:
-            if (!isnum(str)) {
+            try {
+                g.n = std::stoul(str);
+            } catch (const std::exception& e) {
+                std::cerr << " Exception what():" << e.what() << std::endl;
                 std::cerr << " Error code:" << errid::NaN << " = " << err.at(errid::NaN) << std::endl;
                 return errid::NaN;
             }
-            g.n = std::stoul(str);
             break;
 
         case optid::opt_s:
