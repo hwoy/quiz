@@ -19,7 +19,7 @@ A:2:What is the fox:What's the fuck:What's that:All of above
 Q:A cat goes ...?
 A:1:Moew:Moo:Doo:Noew
 
-Q:Which is Linux Distro?
+Q:Which is a Linux Distro?
 A:4:Windows:Linus:FreeBSD:Slackware
 
 Q:What is Linux's mascot?
