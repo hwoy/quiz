@@ -93,9 +93,9 @@ std::pair<game::GAMEID, game::iterator> game::play(player& p, game::iterator i)
 
 void game::showhelper() const
 {
-	if(help.empty())
-		return;
-	
+    if (help.empty())
+        return;
+
     bool zero = true;
     for (const auto& i : help)
         if (i.second->n) {
@@ -170,7 +170,7 @@ void game::showquiz(iterator i)
 
 void game::addhelper(unsigned int key, helper* h)
 {
-    help[key] = std::shared_ptr<helper>(h);
+    help[key].reset(h);
 }
 
 //************************** Helper methodes **********************************
