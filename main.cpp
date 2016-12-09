@@ -211,6 +211,7 @@ int main(int argc, const char* argv[])
                 = init(g, ifs);
         } catch (const std::exception& e) {
             std::cerr << " Exception what():" << e.what() << std::endl;
+            std::cerr << " Error code:" << errid::file_io << " = " << err.at(errid::file_io) << std::endl;
             return errid::file_io;
         }
 
