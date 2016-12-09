@@ -18,16 +18,15 @@
 #define NQUIZ 10
 #define DELIM ":"
 
-static const std::map<unsigned int, std::string> err = { { 1, "File can not be access!" },
-    { 2,
-        "An Question has not an answer." },
-    { 3, "Number of Question record doesn not match" }, { 4, "Question ID doesn't match" },
-    { 5,
-        "Number of Answer record doesn not match" },
-    { 6, "Answer ID doesn't match" }, { 7, "Can not covert to a number" }, { 8, "Invalid Option" }, { 9, "File IO failed!" } };
+static const std::map<unsigned int, std::string> err = { { 1, "File IO failed!" },\
+ { 2, "An Question has not an answer." },\
+ { 3, "Number of Question record doesn not match" },\
+ { 4, "Question ID doesn't match" },\
+ { 5, "Number of Answer record doesn not match" },\
+ { 6, "Answer ID doesn't match" }, { 7, "Can not covert to a number" }, { 8, "Invalid Option" } };
 
 enum errid : unsigned int {
-    file = 1,
+    file_io = 1,
     question_answer = 2,
     question_n = 3,
     question_id = 4,
@@ -35,7 +34,6 @@ enum errid : unsigned int {
     answer_id = 6,
     NaN = 7,
     invalid_opt = 8,
-    file_io = 9
 };
 
 static const std::vector<std::string> option = { "-f:", "-p:", "-n:", "-s", "-h" };
@@ -128,7 +126,7 @@ static std::pair<unsigned int, unsigned int> init(game& g, std::ifstream& ifs)
     return std::make_pair(0, line);
 }
 
-static unsigned int showerr(const std::map<unsigned int, std::string>& err, unsigned int retcode, unsigned int line)
+static unsigned int showerr(const std::map<unsigned int, std::string>& err, const std::string &file, unsigned int retcode, unsigned int line)
 {
     std::cerr << " FILE: " << file << std::endl;
     std::cerr << " Line: " << line << std::endl;
@@ -197,26 +195,24 @@ int main(int argc, const char* argv[])
     //********************* Add Questions ************************
 
     {
-        unsigned int retcode, line;
-        std::ifstream ifs(file);
-
-        if (!ifs) {
-            std::cerr << " FILE: " << file << std::endl;
-            std::cerr << " Error code:" << errid::file << " = " << err.at(errid::file) << std::endl;
-            return errid::file;
-        }
-        ifs.exceptions(std::ifstream::badbit);
+        unsigned int retcode = 0, line = 0;
+        std::ifstream ifs;
         try {
+            ifs.exceptions(std::ifstream::failbit);
+            ifs.open(file);
             std::tie(retcode, line)
                 = init(g, ifs);
         } catch (const std::exception& e) {
-            std::cerr << " Exception what():" << e.what() << std::endl;
-            std::cerr << " Error code:" << errid::file_io << " = " << err.at(errid::file_io) << std::endl;
-            return errid::file_io;
+            if (!ifs.eof()) {
+                std::cerr << " Exception what():" << e.what() << std::endl;
+				std::cerr << " FILE: " << file << std::endl;
+                std::cerr << " Error code:" << errid::file_io << " = " << err.at(errid::file_io) << std::endl;
+                return errid::file_io;
+            }
         }
 
         if (retcode)
-            return showerr(err, retcode, line);
+            return showerr(err, file, retcode, line);
     }
 
     //********************* Add Helper ************************
