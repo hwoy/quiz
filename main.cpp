@@ -1,4 +1,5 @@
 #include <exception>
+#include <exception>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -67,8 +68,7 @@ static std::pair<unsigned int, unsigned int> init(game& g, std::ifstream& ifs)
 
         line++;
 
-        if (ifs.getline(buff.get(), BSIZE).bad())
-            return std::make_pair(errid::file_io, line);
+        ifs.getline(buff.get(), BSIZE);
 
         grap.clear();
         grap.action(buff.get(), DELIM);
@@ -90,8 +90,7 @@ static std::pair<unsigned int, unsigned int> init(game& g, std::ifstream& ifs)
 
             line++;
 
-            if (ifs.getline(buff.get(), BSIZE).bad())
-                return std::make_pair(errid::file_io, line);
+            ifs.getline(buff.get(), BSIZE);
 
             grap.clear();
             grap.action(buff.get(), DELIM);
@@ -127,6 +126,14 @@ static std::pair<unsigned int, unsigned int> init(game& g, std::ifstream& ifs)
     }
 
     return std::make_pair(0, line);
+}
+
+static unsigned int showerr(const std::map<unsigned int, std::string>& err, unsigned int retcode, unsigned int line)
+{
+    std::cerr << " FILE: " << file << std::endl;
+    std::cerr << " Line: " << line << std::endl;
+    std::cerr << " Error code:" << retcode << " = " << err.at(retcode) << std::endl;
+    return retcode;
 }
 
 int main(int argc, const char* argv[])
@@ -198,16 +205,17 @@ int main(int argc, const char* argv[])
             std::cerr << " Error code:" << errid::file << " = " << err.at(errid::file) << std::endl;
             return errid::file;
         }
-
-        std::tie(retcode, line)
-            = init(g, ifs);
-
-        if (retcode) {
-            std::cerr << " FILE: " << file << std::endl;
-            std::cerr << " Line: " << line << std::endl;
-            std::cerr << " Error code:" << retcode << " = " << err.at(retcode) << std::endl;
-            return retcode;
+        ifs.exceptions(std::ifstream::badbit);
+        try {
+            std::tie(retcode, line)
+                = init(g, ifs);
+        } catch (const std::exception& e) {
+            std::cerr << " Exception what():" << e.what() << std::endl;
+            return errid::file_io;
         }
+
+        if (retcode)
+            return showerr(err, retcode, line);
     }
 
     //********************* Add Helper ************************
