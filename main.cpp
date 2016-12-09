@@ -1,5 +1,4 @@
 #include <exception>
-#include <exception>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -17,6 +16,24 @@
 #define PLAYER "Hwoy"
 #define NQUIZ 10
 #define DELIM ":"
+
+class initexception final: public std::exception
+{
+	private:
+	std::string msg;
+	
+	public:
+	initexception(unsigned int line, unsigned int eid, const std::map<unsigned int, std::string> &err)
+	{
+		msg=std::string(" Line:")+ std::to_string(line) + "\n" + \
+		" Error id:" + std::to_string(eid) + " = " + err.at(eid) ;
+	}
+	
+	const char* what() const noexcept
+	{
+		return msg.c_str();
+	}
+};
 
 static const std::map<unsigned int, std::string> err = { { 1, "File IO failed!" },\
  { 2, "An Question has not an answer." },\
@@ -54,7 +71,7 @@ static void showHelp(const char* argv[], const std::vector<std::string>& option,
     std::cerr << grappath(argv[0]) << " " << option[optid::opt_f] << "quiz.txt\n";
 }
 
-static std::pair<unsigned int, unsigned int> init(game& g, std::ifstream& ifs)
+static void init(game& g, std::ifstream& ifs, const std::map<unsigned int, std::string> &err)
 {
     unsigned int line = 0;
 
@@ -75,16 +92,19 @@ static std::pair<unsigned int, unsigned int> init(game& g, std::ifstream& ifs)
             continue;
 
         if (grap.size() != 2)
-            return std::make_pair(errid::question_n, line);
+			throw(initexception(line, errid::question_n, err));
+
         else if (grap[0].compare(Q))
-            return std::make_pair(errid::question_id, line);
+			throw(initexception(line, errid::question_id, err));
+
 
         q.clear();
         q.quizstr = grap[1];
 
         do {
             if (ifs.eof())
-                return std::make_pair(errid::question_answer, line);
+				throw(initexception(line, errid::question_answer, err));
+
 
             line++;
 
@@ -96,9 +116,11 @@ static std::pair<unsigned int, unsigned int> init(game& g, std::ifstream& ifs)
         } while (grap.empty());
 
         if (grap.size() < 3)
-            return std::make_pair(errid::answer_n, line);
+			throw(initexception(line, errid::answer_n, err));
+
         else if (grap[0].compare(A))
-            return std::make_pair(errid::answer_id, line);
+			throw(initexception(line, errid::answer_id, err));
+
 
         for (auto i = grap.begin(); i != grap.end(); ++i) {
             auto j = std::distance(grap.begin(), i);
@@ -110,8 +132,7 @@ static std::pair<unsigned int, unsigned int> init(game& g, std::ifstream& ifs)
                 try {
                     q.answer = std::stoul(grap[j]);
                 } catch (const std::exception& e) {
-                    std::cerr << " Exception what():" << e.what() << std::endl;
-                    return std::make_pair(errid::NaN, line);
+					throw(initexception(line, errid::NaN, err));
                 }
 
                 break;
@@ -123,15 +144,6 @@ static std::pair<unsigned int, unsigned int> init(game& g, std::ifstream& ifs)
         g.push_back(q);
     }
 
-    return std::make_pair(0, line);
-}
-
-static unsigned int showerr(const std::map<unsigned int, std::string>& err, const std::string &file, unsigned int retcode, unsigned int line)
-{
-    std::cerr << " FILE: " << file << std::endl;
-    std::cerr << " Line: " << line << std::endl;
-    std::cerr << " Error code:" << retcode << " = " << err.at(retcode) << std::endl;
-    return retcode;
 }
 
 int main(int argc, const char* argv[])
@@ -168,8 +180,8 @@ int main(int argc, const char* argv[])
             try {
                 g.n = std::stoul(str);
             } catch (const std::exception& e) {
-                std::cerr << " Exception what():" << e.what() << std::endl;
-                std::cerr << " Error code:" << errid::NaN << " = " << err.at(errid::NaN) << std::endl;
+                std::cerr << " Exception what():\n" << " " << e.what() << std::endl;
+                std::cerr << " Error id:" << errid::NaN << " = " << err.at(errid::NaN) << std::endl;
                 return errid::NaN;
             }
             break;
@@ -185,7 +197,7 @@ int main(int argc, const char* argv[])
 
         default:
             std::cerr << " Option: " << str << " is invalid\n";
-            std::cerr << " Error code:" << errid::invalid_opt << " = " << err.at(errid::invalid_opt) << std::endl;
+            std::cerr << " Error id:" << errid::invalid_opt << " = " << err.at(errid::invalid_opt) << std::endl;
             std::cerr << std::endl;
             showHelp(argv, option, optionstr);
             return errid::invalid_opt;
@@ -195,24 +207,26 @@ int main(int argc, const char* argv[])
     //********************* Add Questions ************************
 
     {
-        unsigned int retcode = 0, line = 0;
         std::ifstream ifs;
         try {
+			try {
             ifs.exceptions(std::ifstream::failbit);
             ifs.open(file);
-            std::tie(retcode, line)
-                = init(g, ifs);
+			init(g, ifs ,err);
+			} catch (const initexception &e) {
+				std::cerr << " File:" << file << std::endl;
+                std::cerr << " Exception what():\n" << e.what() << std::endl;
+                return 1;
+			}
         } catch (const std::exception& e) {
             if (!ifs.eof()) {
-                std::cerr << " Exception what():" << e.what() << std::endl;
-				std::cerr << " FILE: " << file << std::endl;
-                std::cerr << " Error code:" << errid::file_io << " = " << err.at(errid::file_io) << std::endl;
-                return errid::file_io;
+				std::cerr << " File:" << file << std::endl;
+                std::cerr << " Exception what():\n" << " " << e.what() << std::endl;
+				std::cerr << " Error id:" << errid::file_io << " = " << err.at(errid::file_io) << std::endl;;
+                return 2;
             }
         }
 
-        if (retcode)
-            return showerr(err, file, retcode, line);
     }
 
     //********************* Add Helper ************************
