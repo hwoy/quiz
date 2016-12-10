@@ -1,4 +1,7 @@
 #include "quiz.hpp"
+#include "helper.hpp"
+#include "quizio.hpp"
+#include <algorithm>
 #include <vector>
 
 bool isnum(const std::string& str)
@@ -54,23 +57,9 @@ void player::reset()
 
 //************************** Game methodes **********************************
 
-std::pair<game::GAMEID, game::iterator> game::play(player& p, game::iterator i)
+std::pair<game::GAMEID, game::iterator> game::play(player& p, game::iterator i, unsigned int key)
 {
     GAMEID id;
-    unsigned int key;
-
-    if (static_cast<unsigned int>(std::distance(begin(), i)) >= n)
-        return std::make_pair(GAMEID::ID_OVER, i);
-
-    showhelper();
-    showkey();
-    std::cout << std::endl;
-
-    showquiz(i);
-
-    std::cout << std::endl;
-    key = choosequiz();
-    std::cout << std::endl;
 
     if (key == GAMEID::ID_QUIT) {
         id = GAMEID::ID_QUIT;
@@ -90,41 +79,6 @@ std::pair<game::GAMEID, game::iterator> game::play(player& p, game::iterator i)
     return std::make_pair(id, i);
 }
 
-void game::showhelper() const
-{
-    bool zero = true;
-    for (const auto& i : help)
-        if (i.second->n) {
-            zero = false;
-            break;
-        }
-
-    if (zero)
-        return;
-
-    std::cout << "[ ";
-
-    for (const auto& i : help)
-        if (i.second->n)
-            std::cout << i.second->name << "(" << i.second->n << ")"
-                      << "=" << i.first << " ";
-    std::cout << "]\n";
-}
-
-void game::showkey() const
-{
-    for (const auto& i : keymap) {
-        std::string key;
-        unsigned int id;
-
-        std::tie(key, id) = i;
-
-        std::cout << key << "(" << keystr.at(id) << ") ";
-    }
-
-    std::cout << std::endl;
-}
-
 void game::reset(unsigned int n)
 {
     for (auto& i : help)
@@ -141,155 +95,18 @@ void game::shuffle(unsigned int i)
     assign(vec.begin(), vec.end());
 }
 
-unsigned int game::choosequiz() const
-{
-    bool valid;
-    unsigned int key;
-
-    do {
-        std::cout << " Please choose -> ";
-        std::tie(valid, key) = getkey(keymap);
-    } while (!valid);
-
-    return key;
-}
-
-void game::showquiz(const_iterator i) const
-{
-    std::cout << std::distance(begin(), i) + 1 << "/" << (n <= size() ? n : size()) << " [ " << i->quizstr << " ]\n";
-
-    for (auto j = i->begin(); j != i->end(); ++j) {
-
-        std::cout << std::distance(i->begin(), j) + 1 << ") " << *j << std::endl;
-    }
-}
-
 void game::addhelper(unsigned int key, helper* h)
 {
     help[key].reset(h);
 }
 
-//************************** Helper methodes **********************************
-void helper::avalidmsg() const
+bool game::isover(const_iterator i) const
 {
-    std::cout << name << " is no longer avaliable\n\n";
+    return (static_cast<unsigned int>(std::distance(begin(), i)) >= n) || (i == end());
 }
 
-void helper::activatemsg() const
+void game::addkey(unsigned int gid, const char* kpress, const char* kstr)
 {
-    std::cout << name << " is activted\n\n";
-}
-
-std::pair<player, game::iterator> randomhelper::action(game& gm, player p, game::iterator i, unsigned int key)
-{
-    if (!n) {
-        avalidmsg();
-    }
-
-    else {
-        std::vector<game::value_type> vec(gm.begin(), gm.end());
-        activatemsg();
-
-        std::shuffle(vec.begin() + std::distance(gm.begin(), i), vec.end(), gm.gen);
-        gm.assign(vec.begin(), vec.end());
-        --n;
-    }
-    return std::make_pair(p, i);
-}
-
-std::pair<player, game::iterator> doublehelper::action(game& gm, player p, game::iterator i, unsigned int key)
-{
-    if (!n) {
-        avalidmsg();
-    }
-
-    else {
-        unsigned int j = 2;
-        bool win = false;
-
-        activatemsg();
-
-        do {
-            unsigned int choose;
-            do {
-                std::cout << "Remain: " << j << "\n\n";
-
-                gm.showquiz(i);
-                choose = gm.choosequiz();
-
-                if (choose == i->answer)
-                    win = true;
-
-            } while (!(choose >= 1 && choose <= i->size()));
-
-        } while (--j);
-
-        if (win)
-            p.score += i->scorepoint;
-        --n;
-        ++i;
-    }
-    return std::make_pair(p, i);
-}
-
-std::pair<player, game::iterator> passhelper::action(game& gm, player p, game::iterator i, unsigned int key)
-{
-    if (!n) {
-        avalidmsg();
-    } else {
-        activatemsg();
-        p.score += i->scorepoint;
-        --n;
-        ++i;
-    }
-
-    return std::make_pair(p, i);
-}
-
-std::pair<player, game::iterator> hinthelper::action(game& gm, player p, game::iterator i, unsigned int key)
-{
-    if (!n) {
-        avalidmsg();
-    }
-
-    else {
-
-        activatemsg();
-
-        std::cout << "May be: " << (std::uniform_int_distribution<>(0, 1)(gm.gen) ? i->answer
-                                                                                  : std::uniform_int_distribution<>(1, i->size())(gm.gen))
-                  << "\n\n";
-        --n;
-    }
-
-    return std::make_pair(p, i);
-}
-
-std::pair<player, game::iterator> pumphelper::action(game& gm, player p, game::iterator i, unsigned int key)
-{
-    if (!n) {
-        avalidmsg();
-    }
-
-    else {
-
-        std::vector<unsigned int> vec;
-
-        for (const auto& i : gm.help)
-            if (key != i.first)
-                vec.push_back(i.first);
-
-        if (vec.empty())
-            return std::make_pair(p, i);
-
-        activatemsg();
-
-        unsigned int j = vec[gm.gen() % (vec.size())];
-
-        gm.help[j]->n++;
-        std::cout << gm.help[j]->name << " is pubped\n";
-        --n;
-    }
-
-    return std::make_pair(p, i);
+    keymap[kpress] = gid;
+    keystr[gid] = kstr;
 }

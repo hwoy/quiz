@@ -1,14 +1,13 @@
 #include <exception>
 #include <fstream>
 #include <iostream>
-#include <map>
-#include <memory>
 #include <string>
-#include <utility>
 
 #include "Cgrap.h"
 #include "Copt.h"
+#include "helper.hpp"
 #include "quiz.hpp"
+#include "quizio.hpp"
 
 #define BSIZE 256
 #define Q "Q"
@@ -17,30 +16,28 @@
 #define NQUIZ 10
 #define DELIM ":"
 
-class initexception final: public std::exception
-{
-	private:
-	std::string msg;
-	
-	public:
-	initexception(unsigned int line, unsigned int eid, const std::map<unsigned int, std::string> &err)
-	{
-		msg=std::string(" Line:")+ std::to_string(line) + "\n" + \
-		" Error id:" + std::to_string(eid) + " = " + err.at(eid) ;
-	}
-	
-	const char* what() const noexcept
-	{
-		return msg.c_str();
-	}
+class initexception final : public std::exception {
+private:
+    std::string msg;
+
+public:
+    initexception(unsigned int line, unsigned int eid, const std::map<unsigned int, std::string>& err)
+    {
+        msg = std::string(" Line:") + std::to_string(line) + "\n" + " Error id:" + std::to_string(eid) + " = " + err.at(eid);
+    }
+
+    const char* what() const noexcept
+    {
+        return msg.c_str();
+    }
 };
 
-static const std::map<unsigned int, std::string> err = { { 1, "File IO failed!" },\
- { 2, "An Question has not an answer." },\
- { 3, "Number of Question record doesn not match" },\
- { 4, "Question ID doesn't match" },\
- { 5, "Number of Answer record doesn not match" },\
- { 6, "Answer ID doesn't match" }, { 7, "Can not covert to a number" }, { 8, "Invalid Option" } };
+static const std::map<unsigned int, std::string> err = { { 1, "File IO failed!" },
+    { 2, "An Question has not an answer." },
+    { 3, "Number of Question record doesn not match" },
+    { 4, "Question ID doesn't match" },
+    { 5, "Number of Answer record doesn not match" },
+    { 6, "Answer ID doesn't match" }, { 7, "Can not covert to a number" }, { 8, "Invalid Option" } };
 
 enum errid : unsigned int {
     file_io = 1,
@@ -71,7 +68,7 @@ static void showHelp(const char* argv[], const std::vector<std::string>& option,
     std::cerr << grappath(argv[0]) << " " << option[optid::opt_f] << "quiz.txt\n";
 }
 
-static void init(game& g, std::ifstream& ifs, const std::map<unsigned int, std::string> &err)
+static void init(game& g, std::ifstream& ifs, const std::map<unsigned int, std::string>& err)
 {
     unsigned int line = 0;
 
@@ -92,19 +89,17 @@ static void init(game& g, std::ifstream& ifs, const std::map<unsigned int, std::
             continue;
 
         if (grap.size() != 2)
-			throw(initexception(line, errid::question_n, err));
+            throw(initexception(line, errid::question_n, err));
 
         else if (grap[0].compare(Q))
-			throw(initexception(line, errid::question_id, err));
-
+            throw(initexception(line, errid::question_id, err));
 
         q.clear();
         q.quizstr = grap[1];
 
         do {
             if (ifs.eof())
-				throw(initexception(line, errid::question_answer, err));
-
+                throw(initexception(line, errid::question_answer, err));
 
             line++;
 
@@ -116,11 +111,10 @@ static void init(game& g, std::ifstream& ifs, const std::map<unsigned int, std::
         } while (grap.empty());
 
         if (grap.size() < 3)
-			throw(initexception(line, errid::answer_n, err));
+            throw(initexception(line, errid::answer_n, err));
 
         else if (grap[0].compare(A))
-			throw(initexception(line, errid::answer_id, err));
-
+            throw(initexception(line, errid::answer_id, err));
 
         for (auto i = grap.begin(); i != grap.end(); ++i) {
             auto j = std::distance(grap.begin(), i);
@@ -132,7 +126,7 @@ static void init(game& g, std::ifstream& ifs, const std::map<unsigned int, std::
                 try {
                     q.answer = std::stoul(grap[j]);
                 } catch (const std::exception& e) {
-					throw(initexception(line, errid::NaN, err));
+                    throw(initexception(line, errid::NaN, err));
                 }
 
                 break;
@@ -143,7 +137,6 @@ static void init(game& g, std::ifstream& ifs, const std::map<unsigned int, std::
 
         g.push_back(q);
     }
-
 }
 
 int main(int argc, const char* argv[])
@@ -180,7 +173,8 @@ int main(int argc, const char* argv[])
             try {
                 g.n = std::stoul(str);
             } catch (const std::exception& e) {
-                std::cerr << " Exception what():\n" << " " << e.what() << std::endl;
+                std::cerr << " Exception what():\n"
+                          << " " << e.what() << std::endl;
                 std::cerr << " Error id:" << errid::NaN << " = " << err.at(errid::NaN) << std::endl;
                 return errid::NaN;
             }
@@ -209,24 +203,26 @@ int main(int argc, const char* argv[])
     {
         std::ifstream ifs;
         try {
-			try {
-            ifs.exceptions(std::ifstream::failbit);
-            ifs.open(file);
-			init(g, ifs ,err);
-			} catch (const initexception &e) {
-				std::cerr << " File:" << file << std::endl;
-                std::cerr << " Exception what():\n" << e.what() << std::endl;
+            try {
+                ifs.exceptions(std::ifstream::failbit);
+                ifs.open(file);
+                init(g, ifs, err);
+            } catch (const initexception& e) {
+                std::cerr << " File:" << file << std::endl;
+                std::cerr << " Exception what():\n"
+                          << e.what() << std::endl;
                 return 1;
-			}
+            }
         } catch (const std::exception& e) {
             if (!ifs.eof()) {
-				std::cerr << " File:" << file << std::endl;
-                std::cerr << " Exception what():\n" << " " << e.what() << std::endl;
-				std::cerr << " Error id:" << errid::file_io << " = " << err.at(errid::file_io) << std::endl;;
+                std::cerr << " File:" << file << std::endl;
+                std::cerr << " Exception what():\n"
+                          << " " << e.what() << std::endl;
+                std::cerr << " Error id:" << errid::file_io << " = " << err.at(errid::file_io) << std::endl;
+                ;
                 return 2;
             }
         }
-
     }
 
     //********************* Add Helper ************************
@@ -237,14 +233,30 @@ int main(int argc, const char* argv[])
     g.addhelper(13, new hinthelper("Hint"));
     g.addhelper(14, new pumphelper("Pump"));
 
+    //********************* Add Key ************************
+
+    g.addkey(game::GAMEID::ID_QUIT, "-", "Quit");
+    g.addkey(game::GAMEID::ID_REDRAW, "+", "Redraw");
+
     //********************* Play game ************************
 
     if (shuffle)
         g.shuffle();
 
-    for (auto i = g.begin(); i != g.end();) {
+    for (auto i = g.begin(); !g.isover(i);) {
+        unsigned int key;
         game::GAMEID id;
-        std::tie(id, i) = g.play(voy, i);
+
+        showhelper(g);
+        showkey(g);
+        std::cout << std::endl;
+        showquiz(g, i);
+
+        std::cout << std::endl;
+        key = choosequiz(g);
+        std::cout << std::endl;
+
+        std::tie(id, i) = g.play(voy, i, key);
 
         if (id == game::GAMEID::ID_QUIT) {
             break;

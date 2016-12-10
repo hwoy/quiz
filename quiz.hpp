@@ -1,9 +1,7 @@
 #ifndef _QUIZ_H_
 #define _QUIZ_H_
 
-#include <algorithm>
 #include <chrono>
-#include <iostream>
 #include <list>
 #include <map>
 #include <memory>
@@ -12,15 +10,6 @@
 #include <utility>
 
 class helper;
-class randomhelper;
-class doublehelper;
-class passhelper;
-class hinthelper;
-class pumphelper;
-
-bool isnum(const std::string& str);
-
-std::pair<bool, unsigned int> getkey(const std::map<std::string, unsigned int>& keymap);
 
 //************************** Player Class **********************************
 
@@ -72,7 +61,7 @@ public:
 class game : public std::list<quiz> {
 public:
     typedef std::list<quiz>::iterator iterator;
-	typedef std::list<quiz>::const_iterator const_iterator;
+    typedef std::list<quiz>::const_iterator const_iterator;
     typedef std::list<quiz>::value_type value_type;
     enum GAMEID : unsigned int { ID_NORMAL = 0,
         ID_OVER = -1U,
@@ -90,124 +79,23 @@ public:
         : gen(t)
         , n(10)
     {
-        keymap["-"] = GAMEID::ID_QUIT;
-        keymap["+"] = GAMEID::ID_REDRAW;
-
-        keystr[GAMEID::ID_QUIT] = "Quit";
-        keystr[GAMEID::ID_REDRAW] = "Redraw";
     }
 
     void shuffle(unsigned int i = 1);
 
     void reset(unsigned int n = 1);
 
-    std::pair<game::GAMEID, game::iterator> play(player& p, game::iterator i);
-
-    unsigned int choosequiz() const;
-
-    void showquiz(const_iterator i) const;
-
-    void showhelper() const;
-
-    void showkey() const;
+    std::pair<game::GAMEID, game::iterator> play(player& p, game::iterator i, unsigned int key);
 
     void addhelper(unsigned int key, helper* h);
+
+    bool isover(const_iterator i) const;
+
+    void addkey(unsigned int gid, const char* kpress, const char* kstr);
 };
 
-//************************** Helper Class **********************************
-class helper {
-public:
-    unsigned int n;
-    unsigned int key;
-    std::string name;
+bool isnum(const std::string& str);
 
-    helper(const char* name, unsigned int n)
-        : n(n)
-        , name(name)
-    {
-    }
-
-    void avalidmsg() const;
-    void activatemsg() const;
-
-    virtual std::pair<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key) = 0;
-};
-
-class randomhelper final : public helper {
-public:
-    randomhelper(const char* name, unsigned int n = 1)
-        : helper(name, n)
-    {
-    }
-
-    std::pair<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
-};
-
-class doublehelper final : public helper {
-public:
-    doublehelper(const char* name, unsigned int n = 1)
-        : helper(name, n)
-    {
-    }
-
-    std::pair<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
-};
-
-class passhelper final : public helper {
-public:
-    passhelper(const char* name, unsigned int n = 1)
-        : helper(name, n)
-    {
-    }
-
-    std::pair<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
-};
-
-class hinthelper final : public helper {
-public:
-    hinthelper(const char* name, unsigned int n = 1)
-        : helper(name, n)
-    {
-    }
-
-    std::pair<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
-};
-
-class pumphelper final : public helper {
-public:
-    pumphelper(const char* name, unsigned int n = 1)
-        : helper(name, n)
-    {
-    }
-
-    std::pair<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key);
-};
-
-class winhelper final : public helper {
-public:
-    winhelper(const char* name, unsigned int n = 1)
-        : helper(name, n)
-    {
-    }
-
-    std::pair<player, game::iterator> action(game& gm, player p, game::iterator i, unsigned int key)
-    {
-        if (!n) {
-            avalidmsg();
-        }
-
-        else {
-
-            activatemsg();
-
-            for (; i != gm.end(); ++i)
-                p.score += i->scorepoint;
-
-            --n;
-        }
-
-        return std::make_pair(p, i);
-    }
-};
+std::pair<bool, unsigned int> getkey(const std::map<std::string, unsigned int>& keymap);
 
 #endif
