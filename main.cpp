@@ -16,6 +16,9 @@
 #define NQUIZ 10
 #define DELIM ":"
 
+#define IDQUIT 100
+#define IDREDRAW 200
+
 class initexception final : public std::exception {
 private:
     std::string msg;
@@ -235,8 +238,8 @@ int main(int argc, const char* argv[])
 
     //********************* Add Key ************************
 
-    g.addkey(game::GAMEID::ID_QUIT, "-", "Quit");
-    g.addkey(game::GAMEID::ID_REDRAW, "+", "Redraw");
+    g.addkey(IDQUIT, "-", "Quit");
+    g.addkey(IDREDRAW, "+", "Redraw");
 
     //********************* Play game ************************
 
@@ -258,11 +261,8 @@ int main(int argc, const char* argv[])
 
         std::tie(id, i) = g.play(voy, i, key);
 
-        if (id == game::GAMEID::ID_QUIT) {
+        if (id == IDQUIT)
             break;
-        } else if (id == game::GAMEID::ID_OVER) {
-            break;
-        }
     }
 
     voy.sum();

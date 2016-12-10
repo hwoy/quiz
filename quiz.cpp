@@ -61,10 +61,8 @@ std::pair<game::GAMEID, game::iterator> game::play(player& p, game::iterator i, 
 {
     GAMEID id;
 
-    if (key == GAMEID::ID_QUIT) {
-        id = GAMEID::ID_QUIT;
-    } else if (key == GAMEID::ID_REDRAW) {
-        id = GAMEID::ID_REDRAW;
+    if (!keystr.empty() && keystr.find(key) != keystr.end()) {
+        id = reinterpret_cast<game::GAMEID&>(key);
     } else {
         if (!help.empty() && help.find(key) != help.end())
             std::tie(p, i) = help[key]->action(*this, p, i, key);
