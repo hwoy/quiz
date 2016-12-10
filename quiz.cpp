@@ -1,8 +1,9 @@
+#include <algorithm>
+#include <vector>
+
 #include "quiz.hpp"
 #include "helper.hpp"
 #include "quizio.hpp"
-#include <algorithm>
-#include <vector>
 
 bool isnum(const std::string& str)
 {

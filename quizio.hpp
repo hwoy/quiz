@@ -1,10 +1,11 @@
 #ifndef _QUIZIO_H_
 #define _QUIZIO_H_
 
-#include "quiz.hpp"
-#include <iostream>
 #include <string>
 #include <utility>
+
+#include "quiz.hpp"
+#include <iostream>
 
 template <typename T>
 void showhelper(const T& g)
