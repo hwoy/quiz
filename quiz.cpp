@@ -1,8 +1,8 @@
 #include <algorithm>
 #include <vector>
 
-#include "quiz.hpp"
 #include "helper.hpp"
+#include "quiz.hpp"
 #include "quizio.hpp"
 
 bool isnum(const std::string& str)
@@ -62,10 +62,10 @@ std::pair<game::GAMEID, game::iterator> game::play(player& p, game::iterator i, 
 {
     GAMEID id;
 
-    if (!keystr.empty() && keystr.find(key) != keystr.end()) {
+    if (keystr.find(key) != keystr.end()) {
         id = reinterpret_cast<game::GAMEID&>(key);
     } else {
-        if (!help.empty() && help.find(key) != help.end())
+        if (help.find(key) != help.end())
             std::tie(p, i) = help[key]->action(*this, p, i, key);
         else if (key >= 1 && key <= i->size()) {
             if (key == i->answer)

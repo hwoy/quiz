@@ -22,9 +22,13 @@
 class initexception final : public std::exception {
 private:
     std::string msg;
+    unsigned int id;
+    unsigned int line;
 
 public:
     initexception(unsigned int line, unsigned int eid, const std::map<unsigned int, std::string>& err)
+        : id(eid)
+        , line(line)
     {
         msg = std::string(" Line:") + std::to_string(line) + "\n" + " Error id:" + std::to_string(eid) + " = " + err.at(eid);
     }
@@ -33,24 +37,34 @@ public:
     {
         return msg.c_str();
     }
+
+    unsigned int getid() const
+    {
+        return id;
+    }
+
+    unsigned int getline() const
+    {
+        return line;
+    }
 };
 
-static const std::map<unsigned int, std::string> err = { { 1, "File IO failed!" },
-    { 2, "An Question has not an answer." },
-    { 3, "Number of Question record doesn not match" },
-    { 4, "Question ID doesn't match" },
-    { 5, "Number of Answer record doesn not match" },
-    { 6, "Answer ID doesn't match" }, { 7, "Can not covert to a number" }, { 8, "Invalid Option" } };
+static const std::map<unsigned int, std::string> err = { { 0, "File IO failed!" },
+    { 1, "An Question has not an answer." },
+    { 2, "Number of Question record doesn not match" },
+    { 3, "Question ID doesn't match" },
+    { 4, "Number of Answer record doesn not match" },
+    { 5, "Answer ID doesn't match" }, { 6, "Can not covert to a number" }, { 7, "Invalid Option" } };
 
 enum errid : unsigned int {
-    file_io = 1,
-    question_answer = 2,
-    question_n = 3,
-    question_id = 4,
-    answer_n = 5,
-    answer_id = 6,
-    NaN = 7,
-    invalid_opt = 8,
+    file_io,
+    question_answer,
+    question_n,
+    question_id,
+    answer_n,
+    answer_id,
+    NaN,
+    invalid_opt,
 };
 
 static const std::vector<std::string> option = { "-f:", "-p:", "-n:", "-s", "-h" };
@@ -179,7 +193,7 @@ int main(int argc, const char* argv[])
                 std::cerr << " Exception what():\n"
                           << " " << e.what() << std::endl;
                 std::cerr << " Error id:" << errid::NaN << " = " << err.at(errid::NaN) << std::endl;
-                return errid::NaN;
+                return errid::NaN + 1;
             }
             break;
 
@@ -197,7 +211,7 @@ int main(int argc, const char* argv[])
             std::cerr << " Error id:" << errid::invalid_opt << " = " << err.at(errid::invalid_opt) << std::endl;
             std::cerr << std::endl;
             showHelp(argv, option, optionstr);
-            return errid::invalid_opt;
+            return errid::invalid_opt + 1;
         }
     }
 
@@ -214,7 +228,7 @@ int main(int argc, const char* argv[])
                 std::cerr << " File:" << file << std::endl;
                 std::cerr << " Exception what():\n"
                           << e.what() << std::endl;
-                return 1;
+                return e.getid() + 1;
             }
         } catch (const std::exception& e) {
             if (!ifs.eof()) {
@@ -223,7 +237,7 @@ int main(int argc, const char* argv[])
                           << " " << e.what() << std::endl;
                 std::cerr << " Error id:" << errid::file_io << " = " << err.at(errid::file_io) << std::endl;
                 ;
-                return 2;
+                return errid::file_io + 1;
             }
         }
     }
