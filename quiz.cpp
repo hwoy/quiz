@@ -111,7 +111,7 @@ void game::showhelper() const
     std::cout << "]\n";
 }
 
-void game::showkey()
+void game::showkey() const
 {
     for (const auto& i : keymap) {
         std::string key;
@@ -119,7 +119,7 @@ void game::showkey()
 
         std::tie(key, id) = i;
 
-        std::cout << key << "(" << keystr[id] << ") ";
+        std::cout << key << "(" << keystr.at(id) << ") ";
     }
 
     std::cout << std::endl;
@@ -154,7 +154,7 @@ unsigned int game::choosequiz() const
     return key;
 }
 
-void game::showquiz(iterator i)
+void game::showquiz(const_iterator i) const
 {
     std::cout << std::distance(begin(), i) + 1 << "/" << (n <= size() ? n : size()) << " [ " << i->quizstr << " ]\n";
 

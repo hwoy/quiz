@@ -72,6 +72,7 @@ public:
 class game : public std::list<quiz> {
 public:
     typedef std::list<quiz>::iterator iterator;
+	typedef std::list<quiz>::const_iterator const_iterator;
     typedef std::list<quiz>::value_type value_type;
     enum GAMEID : unsigned int { ID_NORMAL = 0,
         ID_OVER = -1U,
@@ -104,11 +105,11 @@ public:
 
     unsigned int choosequiz() const;
 
-    void showquiz(iterator i);
+    void showquiz(const_iterator i) const;
 
     void showhelper() const;
 
-    void showkey();
+    void showkey() const;
 
     void addhelper(unsigned int key, helper* h);
 };
