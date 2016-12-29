@@ -27,10 +27,10 @@ private:
 
 public:
     initexception(unsigned int line, unsigned int eid, const std::map<unsigned int, std::string>& err)
-        : id(eid)
+        :msg(std::string(" Line:") + std::to_string(line) + "\n" + " Error id:" + std::to_string(eid) + " = " + err.at(eid))
+		, id(eid)
         , line(line)
     {
-        msg = std::string(" Line:") + std::to_string(line) + "\n" + " Error id:" + std::to_string(eid) + " = " + err.at(eid);
     }
 
     const char* what() const noexcept
@@ -67,18 +67,19 @@ enum errid : unsigned int {
     invalid_opt,
 };
 
-static const std::vector<std::string> option = { "-f:", "-p:", "-n:", "-s", "-h" };
+static const char* option[] = { "-f:", "-p:", "-n:", "-s", "-h" };
 enum optid : unsigned int { opt_f,
     opt_p,
     opt_n,
     opt_s,
     opt_h };
 
-static const std::vector<std::string> optionstr = { "Quiz File", "Player Name", "Number of Quiz", "Don't Shuffle", "Help" };
+static const char* optionstr[] = { "Quiz File", "Player Name", "Number of Quiz", "Don't Shuffle", "Help" };
 
-static void showHelp(const char* argv[], const std::vector<std::string>& option, const std::vector<std::string>& optionstr)
+template <typename T,std::size_t N>
+static void showHelp(const char* argv[], const T (&option)[N], const T (&optionstr)[N])
 {
-    for (unsigned int i = 0; i < option.size() && i < optionstr.size(); ++i)
+    for (unsigned int i = 0; i < N; ++i)
         std::cerr << option[i] << " = " << optionstr[i] << std::endl;
 
     std::cerr << "\nExample\n";

@@ -19,12 +19,23 @@ public:
     enum ID : unsigned int { END = -2U,
         OTHER = -1U };
 
-    Copt(int argc, const char** argv, const std::vector<std::string>& param, unsigned int start = 1)
+	template <typename iterator>
+    Copt(int argc, const char** argv, iterator bparam, iterator eparam, unsigned int start = 1)
         : argc(argc)
         , index(start)
         , start(start)
         , argv(argv)
-        , param(param)
+        , param(bparam,eparam)
+    {
+    }
+	
+	template <typename T,std::size_t N>
+    Copt(int argc, const char** argv, const T (&param)[N], unsigned int start = 1)
+        : argc(argc)
+        , index(start)
+        , start(start)
+        , argv(argv)
+        , param(param,param+N)
     {
     }
 
