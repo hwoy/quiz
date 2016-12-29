@@ -68,7 +68,7 @@ public:
 
                 if (!std::strncmp(argv[j], i->c_str(), i->size())) {
                     index = j + 1;
-                    return std::make_pair(std::distance(param.begin(), i), std::string(argv[j] + i->size()));
+                    return std::make_pair(i-param.begin(), std::string(argv[j] + i->size()));
                 }
             }
 
