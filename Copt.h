@@ -39,11 +39,22 @@ public:
     {
     }
 
-    void init(int argc, const char** argv, const std::vector<std::string>& param, unsigned int start = 1)
+	template <typename iterator>
+    void init(int argc, const char** argv, iterator bparam, iterator eparam, unsigned int start = 1)
     {
         this->argc = argc;
         this->argv = argv;
-        this->param.assign(param.begin(), param.end());
+        this->param.assign(bparam, eparam);
+        this->index = start;
+        this->start = start;
+    }
+
+	template <typename T,std::size_t N>	
+    void init(int argc, const char** argv, const T (&param)[N], unsigned int start = 1)
+    {
+        this->argc = argc;
+        this->argv = argv;
+        this->param.assign(param, param+N);
         this->index = start;
         this->start = start;
     }
