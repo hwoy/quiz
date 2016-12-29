@@ -26,9 +26,9 @@ private:
     unsigned int line;
 
 public:
-    initexception(unsigned int line, unsigned int eid, const std::map<unsigned int, std::string>& err)
-        :msg(std::string(" Line:") + std::to_string(line) + "\n" + " Error id:" + std::to_string(eid) + " = " + err.at(eid))
-		, id(eid)
+    initexception(unsigned int line, unsigned int eid, const char* err[])
+        : msg(std::string(" Line:") + std::to_string(line) + "\n" + " Error id:" + std::to_string(eid) + " = " + err[eid])
+        , id(eid)
         , line(line)
     {
     }
@@ -49,12 +49,12 @@ public:
     }
 };
 
-static const std::map<unsigned int, std::string> err = { { 0, "File IO failed!" },
-    { 1, "An Question has not an answer." },
-    { 2, "Number of Question record doesn not match" },
-    { 3, "Question ID doesn't match" },
-    { 4, "Number of Answer record doesn not match" },
-    { 5, "Answer ID doesn't match" }, { 6, "Can not covert to a number" }, { 7, "Invalid Option" } };
+static const char* err[] = { "File IO failed!",
+    "An Question has not an answer.",
+    "Number of Question record doesn not match",
+    "Question ID doesn't match",
+    "Number of Answer record doesn not match",
+    "Answer ID doesn't match", "Can not covert to a number", "Invalid Option" };
 
 enum errid : unsigned int {
     file_io,
@@ -76,7 +76,7 @@ enum optid : unsigned int { opt_f,
 
 static const char* optionstr[] = { "Quiz File", "Player Name", "Number of Quiz", "Don't Shuffle", "Help" };
 
-template <typename T,std::size_t N>
+template <typename T, std::size_t N>
 static void showHelp(const char* argv[], const T (&option)[N], const T (&optionstr)[N])
 {
     for (unsigned int i = 0; i < N; ++i)
@@ -86,7 +86,7 @@ static void showHelp(const char* argv[], const T (&option)[N], const T (&options
     std::cerr << grappath(argv[0]) << " " << option[optid::opt_f] << "quiz.txt\n";
 }
 
-static void init(game& g, std::ifstream& ifs, const std::map<unsigned int, std::string>& err)
+static void init(game& g, std::ifstream& ifs, const char* err[])
 {
     unsigned int line = 0;
 
@@ -193,7 +193,7 @@ int main(int argc, const char* argv[])
             } catch (const std::exception& e) {
                 std::cerr << " Exception what():\n"
                           << " " << e.what() << std::endl;
-                std::cerr << " Error id:" << errid::NaN << " = " << err.at(errid::NaN) << std::endl;
+                std::cerr << " Error id:" << errid::NaN << " = " << err[errid::NaN] << std::endl;
                 return errid::NaN + 1;
             }
             break;
@@ -209,7 +209,7 @@ int main(int argc, const char* argv[])
 
         default:
             std::cerr << " Option: " << str << " is invalid\n";
-            std::cerr << " Error id:" << errid::invalid_opt << " = " << err.at(errid::invalid_opt) << std::endl;
+            std::cerr << " Error id:" << errid::invalid_opt << " = " << err[errid::invalid_opt] << std::endl;
             std::cerr << std::endl;
             showHelp(argv, option, optionstr);
             return errid::invalid_opt + 1;
@@ -236,7 +236,7 @@ int main(int argc, const char* argv[])
                 std::cerr << " File:" << file << std::endl;
                 std::cerr << " Exception what():\n"
                           << " " << e.what() << std::endl;
-                std::cerr << " Error id:" << errid::file_io << " = " << err.at(errid::file_io) << std::endl;
+                std::cerr << " Error id:" << errid::file_io << " = " << err[errid::file_io] << std::endl;
                 ;
                 return errid::file_io + 1;
             }
