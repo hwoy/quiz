@@ -21,6 +21,8 @@ public:
     {
     }
 
+    virtual ~helper() {}
+
     void avalidmsg() const
     {
         std::cout << name << " is no longer avaliable\n\n";
