@@ -77,7 +77,7 @@ public:
             return std::make_pair(ID::OTHER, std::string(argv[j]));
         }
 
-        return std::make_pair(ID::END, std::string("End of Argument"));
+        return std::make_pair(ID::END, std::string());
     }
 };
 #endif

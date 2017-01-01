@@ -11,7 +11,7 @@ bool isnum(const std::string& str)
         if (!(i >= '0' && i <= '9'))
             return false;
 
-    return str.empty() ? false : true;
+    return !str.empty();
 }
 
 std::pair<bool, unsigned int> getkey(const std::map<std::string, unsigned int>& keymap)
