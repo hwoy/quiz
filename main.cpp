@@ -54,7 +54,8 @@ static const char* err[] = { "File IO failed!",
     "Number of Question record doesn not match",
     "Question ID doesn't match",
     "Number of Answer record doesn not match",
-    "Answer ID doesn't match", "Can not covert to a number", "Invalid Option" };
+    "Answer ID doesn't match", "Can not covert to a number", "Invalid Option",
+    "Line Buffer is not exceed!" };
 
 enum errid : unsigned int {
     file_io,
@@ -65,6 +66,7 @@ enum errid : unsigned int {
     answer_id,
     NaN,
     invalid_opt,
+    buffsize
 };
 
 static const char* option[] = { "-f:", "-p:", "-n:", "-s", "-h" };
@@ -98,7 +100,8 @@ static void init(game& g, std::ifstream& ifs, const char* err[])
 
         line++;
 
-        ifs.getline(buff.get(), BSIZE);
+        if (ifs.getline(buff.get(), BSIZE).fail() && !ifs.eof())
+            throw(initexception(line, errid::buffsize, err));
 
         grap.clear();
         grap.action(buff.get(), DELIM);
@@ -121,7 +124,8 @@ static void init(game& g, std::ifstream& ifs, const char* err[])
 
             line++;
 
-            ifs.getline(buff.get(), BSIZE);
+            if (ifs.getline(buff.get(), BSIZE).fail() && !ifs.eof())
+                throw(initexception(line, errid::buffsize, err));
 
             grap.clear();
             grap.action(buff.get(), DELIM);
@@ -219,27 +223,19 @@ int main(int argc, const char* argv[])
     //********************* Add Questions ************************
 
     {
-        std::ifstream ifs;
+        std::ifstream ifs(file);
+        if (!ifs) {
+            std::cerr << " File:" << file << std::endl;
+            std::cerr << " Error id:" << errid::file_io << " = " << err[errid::file_io] << std::endl;
+            return errid::file_io + 1;
+        }
         try {
-            try {
-                ifs.exceptions(std::ifstream::failbit);
-                ifs.open(file);
-                init(g, ifs, err);
-            } catch (const initexception& e) {
-                std::cerr << " File:" << file << std::endl;
-                std::cerr << " Exception what():\n"
-                          << e.what() << std::endl;
-                return e.getid() + 1;
-            }
-        } catch (const std::exception& e) {
-            if (!ifs.eof()) {
-                std::cerr << " File:" << file << std::endl;
-                std::cerr << " Exception what():\n"
-                          << " " << e.what() << std::endl;
-                std::cerr << " Error id:" << errid::file_io << " = " << err[errid::file_io] << std::endl;
-                ;
-                return errid::file_io + 1;
-            }
+            init(g, ifs, err);
+        } catch (const initexception& e) {
+            std::cerr << " File:" << file << std::endl;
+            std::cerr << " Exception what():\n"
+                      << e.what() << std::endl;
+            return e.getid() + 1;
         }
     }
 
